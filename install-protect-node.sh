@@ -23,28 +23,52 @@ fi
 
 [ -z "$AVATAR_URL" ] && AVATAR_URL="$DEFAULT_AVATAR"
 
-echo "🚀 Installing PROTECT NODE (STRICT MODE)..."
+echo "🚀 Installing PROTECT NODE (FINAL MODE)"
 
 # ================= BACKUP =================
-cp "$CONTROLLER" "$CONTROLLER.bak_$TIMESTAMP"
+if [ -f "$CONTROLLER" ]; then
+  cp "$CONTROLLER" "$CONTROLLER.bak_$TIMESTAMP"
+  echo "📦 Backup NodeController.php dibuat"
+fi
 
-# ================= HARD PATCH CONTROLLER =================
-sed -i '/use Illuminate\\Support\\Facades\\Auth;/a\\
-use Illuminate\\Http\\Response;
-' "$CONTROLLER"
+# ================= CONTROLLER (FULL OVERRIDE) =================
+cat > "$CONTROLLER" << 'PHP'
+<?php
 
-sed -i '/public function index(Request $request)/,/return .*admin.nodes.index/{
-/Auth::user()/d
-}' "$CONTROLLER"
+namespace Pterodactyl\Http\Controllers\Admin\Nodes;
 
-sed -i "/public function index(Request \$request)/a\\
-        if (!\\\\Illuminate\\\\Support\\\\Facades\\\\Auth::check() || \\\\
-            \\\\Illuminate\\\\Support\\\\Facades\\\\Auth::id() !== 1) {\\
-            return response()->view('errors.protect-node', [], 403);\\
+use Illuminate\View\View;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Pterodactyl\Models\Node;
+use Spatie\QueryBuilder\QueryBuilder;
+use Pterodactyl\Http\Controllers\Controller;
+use Illuminate\Contracts\View\Factory as ViewFactory;
+
+class NodeController extends Controller
+{
+    public function __construct(private ViewFactory $view) {}
+
+    public function index(Request $request): View
+    {
+        // 🔒 HARD PROTECT NODE
+        if (!Auth::check() || Auth::id() !== 1) {
+            return response()->view('errors.protect-node', [], 403);
         }
-" "$CONTROLLER"
 
-echo "✅ Controller PROTECT dipasang (NON-BYPASS)"
+        $nodes = QueryBuilder::for(
+            Node::query()->with('location')->withCount('servers')
+        )
+        ->allowedFilters(['uuid', 'name'])
+        ->allowedSorts(['id'])
+        ->paginate(25);
+
+        return $this->view->make('admin.nodes.index', ['nodes' => $nodes]);
+    }
+}
+PHP
+
+echo "✅ Controller berhasil diproteksi"
 
 # ================= VIEW =================
 mkdir -p "$VIEW_PATH"
@@ -221,5 +245,8 @@ audio {
 </html>
 HTML
 
+chmod 644 "$CONTROLLER"
 chmod 644 "$VIEW_FILE"
-echo "🔒 PROTECT NODE AKTIF (ANTI REFRESH • ANTI BYPASS)"
+chmod 755 "$VIEW_PATH"
+
+echo "🔒 PROTECT BY REZZX NODE AKTIF (FINAL • NON-BYPASS )"
