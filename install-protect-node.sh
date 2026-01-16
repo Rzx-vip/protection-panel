@@ -4,7 +4,7 @@
 PANEL_PATH="/var/www/pterodactyl"
 CONTROLLER="$PANEL_PATH/app/Http/Controllers/Admin/Nodes/NodeController.php"
 VIEW_PATH="$PANEL_PATH/resources/views/errors"
-VIEW_FILE="$VIEW_PATH/protect-node.blade.php"
+VIEW_FILE="$VIEW_PATH/403.blade.php"
 
 DOMAIN="$1"
 URL_WA="$2"
@@ -21,9 +21,7 @@ if [ -z "$DOMAIN" ] || [ -z "$URL_WA" ]; then
   exit 1
 fi
 
-if [ -z "$AVATAR_URL" ]; then
-  AVATAR_URL="$DEFAULT_AVATAR"
-fi
+[ -z "$AVATAR_URL" ] && AVATAR_URL="$DEFAULT_AVATAR"
 
 echo "🚀 Installing PROTECT NODE..."
 echo "🌐 Domain  : $DOMAIN"
@@ -36,45 +34,21 @@ if [ -f "$CONTROLLER" ]; then
   echo "📦 Backup controller dibuat"
 fi
 
-# ================= CONTROLLER =================
-cat > "$CONTROLLER" << 'PHP'
-<?php
+# ================= PATCH CONTROLLER (AMAN) =================
+if ! grep -q "PROTECT_NODE_REZZX" "$CONTROLLER"; then
+  sed -i "/public function index(Request \$request)/a\\
+        // PROTECT_NODE_REZZX\\
+        if (!\\\\Illuminate\\\\Support\\\\Facades\\\\Auth::check() || \\\\
+            \\\\Illuminate\\\\Support\\\\Facades\\\\Auth::id() !== 1) {\\
+            abort(403);\\
+        }\\
+  " "$CONTROLLER"
+  echo "✅ Protect Node guard berhasil dipasang"
+else
+  echo "ℹ Protect Node sudah terpasang, skip"
+fi
 
-namespace Pterodactyl\Http\Controllers\Admin\Nodes;
-
-use Illuminate\View\View;
-use Illuminate\Http\Request;
-use Pterodactyl\Models\Node;
-use Spatie\QueryBuilder\QueryBuilder;
-use Pterodactyl\Http\Controllers\Controller;
-use Illuminate\Contracts\View\Factory as ViewFactory;
-use Illuminate\Support\Facades\Auth;
-
-class NodeController extends Controller
-{
-    public function __construct(private ViewFactory $view) {}
-
-    public function index(Request $request): View
-    {
-        $user = Auth::user();
-
-        if (!$user || $user->id !== 1) {
-            return response()->view('errors.protect-node', [], 403);
-        }
-
-        $nodes = QueryBuilder::for(
-            Node::query()->with('location')->withCount('servers')
-        )
-        ->allowedFilters(['uuid', 'name'])
-        ->allowedSorts(['id'])
-        ->paginate(25);
-
-        return $this->view->make('admin.nodes.index', ['nodes' => $nodes]);
-    }
-}
-PHP
-
-# ================= VIEW =================
+# ================= VIEW (HTML ASLI TANPA PERUBAHAN) =================
 mkdir -p "$VIEW_PATH"
 
 cat > "$VIEW_FILE" << HTML
@@ -115,7 +89,6 @@ body {
   padding: 20px;
 }
 
-/* HEADER */
 .header {
   opacity: .85;
   margin-bottom: 40px;
@@ -133,7 +106,6 @@ body {
   margin: 0;
 }
 
-/* AVATAR */
 .avatar {
   width: 130px;
   height: 130px;
@@ -144,7 +116,6 @@ body {
   border: 3px solid #020617;
 }
 
-/* QUOTE */
 .quote {
   font-size: 13px;
   color: var(--muted);
@@ -153,7 +124,6 @@ body {
   line-height: 1.5;
 }
 
-/* PLAYER */
 .player {
   background: #fff;
   color: #000;
@@ -168,7 +138,6 @@ audio {
   width: 100%;
 }
 
-/* BUTTONS */
 .buttons {
   display: flex;
   justify-content: center;
@@ -188,7 +157,6 @@ audio {
   overflow: hidden;
 }
 
-/* SHINE EFFECT */
 .btn::before {
   content: "";
   position: absolute;
@@ -211,7 +179,6 @@ audio {
   100% { left: 125%; }
 }
 
-/* FOOTER */
 .footer {
   position: fixed;
   bottom: 15px;
@@ -226,7 +193,6 @@ audio {
 <body>
 
 <div class="wrapper">
-
   <div class="header">
     <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
   </div>
@@ -246,10 +212,9 @@ audio {
   </div>
 
   <div class="buttons">
-   <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
+    <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
     <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
   </div>
-
 </div>
 
 <div class="footer">
@@ -261,7 +226,6 @@ audio {
 HTML
 
 # ================= PERMISSION =================
-chmod 644 "$CONTROLLER"
 chmod 644 "$VIEW_FILE"
 chmod 755 "$VIEW_PATH"
 
