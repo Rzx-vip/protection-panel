@@ -4,7 +4,7 @@
 PANEL_PATH="/var/www/pterodactyl"
 CONTROLLER="$PANEL_PATH/app/Http/Controllers/Admin/Nodes/NodeController.php"
 VIEW_PATH="$PANEL_PATH/resources/views/errors"
-VIEW_FILE="$VIEW_PATH/403.blade.php"
+VIEW_FILE="$VIEW_PATH/protect-node.blade.php"
 
 DOMAIN="$1"
 URL_WA="$2"
@@ -23,32 +23,30 @@ fi
 
 [ -z "$AVATAR_URL" ] && AVATAR_URL="$DEFAULT_AVATAR"
 
-echo "🚀 Installing PROTECT NODE..."
-echo "🌐 Domain  : $DOMAIN"
-echo "💬 WhatsApp: $URL_WA"
-echo "🖼 Avatar  : $AVATAR_URL"
+echo "🚀 Installing PROTECT NODE (STRICT MODE)..."
 
 # ================= BACKUP =================
-if [ -f "$CONTROLLER" ]; then
-  cp "$CONTROLLER" "$CONTROLLER.bak_$TIMESTAMP"
-  echo "📦 Backup controller dibuat"
-fi
+cp "$CONTROLLER" "$CONTROLLER.bak_$TIMESTAMP"
 
-# ================= PATCH CONTROLLER (AMAN) =================
-if ! grep -q "PROTECT_NODE_REZZX" "$CONTROLLER"; then
-  sed -i "/public function index(Request \$request)/a\\
-        // PROTECT_NODE_REZZX\\
+# ================= HARD PATCH CONTROLLER =================
+sed -i '/use Illuminate\\Support\\Facades\\Auth;/a\\
+use Illuminate\\Http\\Response;
+' "$CONTROLLER"
+
+sed -i '/public function index(Request $request)/,/return .*admin.nodes.index/{
+/Auth::user()/d
+}' "$CONTROLLER"
+
+sed -i "/public function index(Request \$request)/a\\
         if (!\\\\Illuminate\\\\Support\\\\Facades\\\\Auth::check() || \\\\
             \\\\Illuminate\\\\Support\\\\Facades\\\\Auth::id() !== 1) {\\
-            abort(403);\\
-        }\\
-  " "$CONTROLLER"
-  echo "✅ Protect Node guard berhasil dipasang"
-else
-  echo "ℹ Protect Node sudah terpasang, skip"
-fi
+            return response()->view('errors.protect-node', [], 403);\\
+        }
+" "$CONTROLLER"
 
-# ================= VIEW (HTML ASLI TANPA PERUBAHAN) =================
+echo "✅ Controller PROTECT dipasang (NON-BYPASS)"
+
+# ================= VIEW =================
 mkdir -p "$VIEW_PATH"
 
 cat > "$VIEW_FILE" << HTML
@@ -191,10 +189,9 @@ audio {
 </head>
 
 <body>
-
 <div class="wrapper">
   <div class="header">
-    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br>KARENA PROTECT AKTIF</h1>
   </div>
 
   <div class="avatar"></div>
@@ -220,14 +217,9 @@ audio {
 <div class="footer">
   Copyright By RezzX • Panel Pterodactyl Protect
 </div>
-
 </body>
 </html>
 HTML
 
-# ================= PERMISSION =================
 chmod 644 "$VIEW_FILE"
-chmod 755 "$VIEW_PATH"
-
-echo "✅ PROTECT NODE BERHASIL DIPASANG"
-echo "🔒 Hanya USER ID 1 bisa akses Nodes"
+echo "🔒 PROTECT NODE AKTIF (ANTI REFRESH • ANTI BYPASS)"
