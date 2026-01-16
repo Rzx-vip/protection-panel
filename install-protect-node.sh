@@ -1,24 +1,19 @@
 #!/bin/bash
 
 PANEL_PATH="/var/www/pterodactyl"
-CONTROLLER="$PANEL_PATH/app/Http/Controllers/Admin/Nodes/NodeController.php"
-VIEW_PATH="$PANEL_PATH/resources/views/errors"
-VIEW_FILE="$VIEW_PATH/protect-node.blade.php"
+
+ERROR_VIEW="$PANEL_PATH/resources/views/errors/403.blade.php"
+MIDDLEWARE="$PANEL_PATH/app/Http/Middleware/ProtectNode.php"
+KERNEL="$PANEL_PATH/app/Http/Kernel.php"
 
 DOMAIN="$1"
-URL_WA="$2"
-AVATAR_URL="$3"
+WA="$2"
+AVATAR="${3:-https://files.catbox.moe/1s2o5m.jpg}"
 
-DEFAULT_AVATAR="https://files.catbox.moe/1s2o5m.jpg"
+echo "🔒 Installing Protect Node (REAL FIX)"
 
-[ -z "$AVATAR_URL" ] && AVATAR_URL="$DEFAULT_AVATAR"
-
-echo "🔒 Installing Protect Node (SAFE MODE)"
-
-# ================= VIEW =================
-mkdir -p "$VIEW_PATH"
-
-cat > "$VIEW_FILE" << HTML
+# ================= 403 VIEW =================
+cat > "$ERROR_VIEW" << HTML
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -26,63 +21,74 @@ cat > "$VIEW_FILE" << HTML
 <title>403 | Node Protected</title>
 <style>
 body{
-  margin:0;
-  background:#0b1220;
-  color:#cbd5e1;
-  font-family:Segoe UI;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
+background:#0b1220;
+color:#cbd5e1;
+font-family:Segoe UI;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
 }
-.box{
-  text-align:center;
-}
+.box{text-align:center}
 .avatar{
-  width:130px;
-  height:130px;
-  border-radius:50%;
-  background:url("$AVATAR_URL") center/cover no-repeat;
-  margin:0 auto 20px;
-  box-shadow:0 0 25px #6366f1;
+width:120px;
+height:120px;
+border-radius:50%;
+background:url("$AVATAR") center/cover no-repeat;
+margin:0 auto 20px;
+box-shadow:0 0 20px #6366f1;
 }
 a{
-  display:inline-block;
-  margin:10px;
-  padding:10px 20px;
-  border-radius:10px;
-  background:#6366f1;
-  color:#fff;
-  text-decoration:none;
+padding:10px 20px;
+background:#6366f1;
+color:#fff;
+border-radius:10px;
+text-decoration:none;
+margin:5px;
+display:inline-block;
 }
 </style>
 </head>
 <body>
 <div class="box">
-  <div class="avatar"></div>
-  <h2>🚫 NODE DIPROTEK</h2>
-  <p>Kamu tidak punya akses ke menu node</p>
-  <a href="$DOMAIN/admin">BACK</a>
-  <a href="$URL_WA">CHAT ADMIN</a>
+<div class="avatar"></div>
+<h2>🚫 NODE DIPROTEK</h2>
+<p>Kamu tidak punya izin membuka Node Panel</p>
+<a href="$DOMAIN/admin">BACK</a>
+<a href="$WA">CHAT ADMIN</a>
 </div>
 </body>
 </html>
 HTML
 
-# ================= CONTROLLER PATCH (AMAN) =================
-grep -q "protect-node" "$CONTROLLER" || sed -i '/public function index(/a\
-        if (!auth()->check() || auth()->id() !== 1) {\
-            return response()->view("errors.protect-node", [], 403);\
-        }\
-' "$CONTROLLER"
+# ================= MIDDLEWARE =================
+cat > "$MIDDLEWARE" << 'PHP'
+<?php
 
-# ================= PERMISSION =================
-chmod 644 "$VIEW_FILE"
+namespace Pterodactyl\Http\Middleware;
+
+use Closure;
+
+class ProtectNode
+{
+    public function handle($request, Closure $next)
+    {
+        if (auth()->id() !== 1) {
+            abort(403);
+        }
+        return $next($request);
+    }
+}
+PHP
+
+# ================= REGISTER MIDDLEWARE =================
+grep -q ProtectNode "$KERNEL" || sed -i "/'web' => \[/a\        \\Pterodactyl\\Http\\Middleware\\ProtectNode::class," "$KERNEL"
 
 # ================= CLEAR CACHE =================
-cd "$PANEL_PATH" || exit 1
+cd "$PANEL_PATH" || exit
 php artisan view:clear
 php artisan route:clear
 php artisan config:clear
 
-echo "✅ PROTECT NODE AKTIF & STABIL"
+echo "✅ PROTECT NODE AKTIF • NO 500 • NO BYPASS"
