@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# ================= CONFIG ==================
 PANEL_PATH="/var/www/pterodactyl"
 CONTROLLER="$PANEL_PATH/app/Http/Controllers/Admin/Nodes/NodeController.php"
 VIEW_PATH="$PANEL_PATH/resources/views/errors"
@@ -11,64 +10,10 @@ URL_WA="$2"
 AVATAR_URL="$3"
 
 DEFAULT_AVATAR="https://files.catbox.moe/1s2o5m.jpg"
-TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-
-# ================= VALIDATION =================
-if [ -z "$DOMAIN" ] || [ -z "$URL_WA" ]; then
-  echo "❌ PARAMETER TIDAK LENGKAP"
-  echo "📌 Contoh:"
-  echo "bash install-protect-node.sh https://panel.example.com https://wa.me/62812345678 https://file.catbox.moe/contoh.png"
-  exit 1
-fi
 
 [ -z "$AVATAR_URL" ] && AVATAR_URL="$DEFAULT_AVATAR"
 
-echo "🚀 Installing PROTECT NODE (FINAL MODE)"
-
-# ================= BACKUP =================
-if [ -f "$CONTROLLER" ]; then
-  cp "$CONTROLLER" "$CONTROLLER.bak_$TIMESTAMP"
-  echo "📦 Backup NodeController.php dibuat"
-fi
-
-# ================= CONTROLLER (FULL OVERRIDE) =================
-cat > "$CONTROLLER" << 'PHP'
-<?php
-
-namespace Pterodactyl\Http\Controllers\Admin\Nodes;
-
-use Illuminate\View\View;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Pterodactyl\Models\Node;
-use Spatie\QueryBuilder\QueryBuilder;
-use Pterodactyl\Http\Controllers\Controller;
-use Illuminate\Contracts\View\Factory as ViewFactory;
-
-class NodeController extends Controller
-{
-    public function __construct(private ViewFactory $view) {}
-
-    public function index(Request $request): View
-    {
-        // 🔒 HARD PROTECT NODE
-        if (!Auth::check() || Auth::id() !== 1) {
-            return response()->view('errors.protect-node', [], 403);
-        }
-
-        $nodes = QueryBuilder::for(
-            Node::query()->with('location')->withCount('servers')
-        )
-        ->allowedFilters(['uuid', 'name'])
-        ->allowedSorts(['id'])
-        ->paginate(25);
-
-        return $this->view->make('admin.nodes.index', ['nodes' => $nodes]);
-    }
-}
-PHP
-
-echo "✅ Controller berhasil diproteksi"
+echo "🔒 Installing Protect Node (SAFE MODE)"
 
 # ================= VIEW =================
 mkdir -p "$VIEW_PATH"
@@ -78,175 +23,66 @@ cat > "$VIEW_FILE" << HTML
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>403 | Protect Panel RezzX</title>
-
+<title>403 | Node Protected</title>
 <style>
-:root {
-  --bg: #0b1220;
-  --text: #cbd5e1;
-  --muted: #64748b;
-  --accent: #38bdf8;
-  --danger: #ef4444;
+body{
+  margin:0;
+  background:#0b1220;
+  color:#cbd5e1;
+  font-family:Segoe UI;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
 }
-
-* {
-  box-sizing: border-box;
-  font-family: "Segoe UI", sans-serif;
+.box{
+  text-align:center;
 }
-
-body {
-  margin: 0;
-  background: radial-gradient(circle at top, #0f172a, var(--bg));
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--text);
+.avatar{
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  background:url("$AVATAR_URL") center/cover no-repeat;
+  margin:0 auto 20px;
+  box-shadow:0 0 25px #6366f1;
 }
-
-.wrapper {
-  text-align: center;
-  width: 100%;
-  padding: 20px;
-}
-
-.header {
-  opacity: .85;
-  margin-bottom: 40px;
-}
-
-.header span {
-  font-size: 26px;
-  color: var(--danger);
-  margin-right: 8px;
-}
-
-.header h1 {
-  font-size: 18px;
-  font-weight: 500;
-  margin: 0;
-}
-
-.avatar {
-  width: 130px;
-  height: 130px;
-  margin: 0 auto 15px;
-  border-radius: 50%;
-  background: url("$AVATAR_URL") center/cover no-repeat;
-  box-shadow: 0 0 25px rgba(99,102,241,.6);
-  border: 3px solid #020617;
-}
-
-.quote {
-  font-size: 13px;
-  color: var(--muted);
-  max-width: 320px;
-  margin: 10px auto 18px;
-  line-height: 1.5;
-}
-
-.player {
-  background: #fff;
-  color: #000;
-  border-radius: 30px;
-  padding: 10px 15px;
-  max-width: 330px;
-  margin: 0 auto 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,.4);
-}
-
-audio {
-  width: 100%;
-}
-
-.buttons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 15px;
-}
-
-.btn {
-  position: relative;
-  padding: 12px 22px;
-  font-weight: bold;
-  border-radius: 12px;
-  text-decoration: none;
-  color: #fff;
-  background: linear-gradient(135deg, #0ea5e9, #6366f1);
-  box-shadow: 0 0 18px rgba(56,189,248,.6);
-  overflow: hidden;
-}
-
-.btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -75%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(
-    120deg,
-    transparent,
-    rgba(255,255,255,.7),
-    transparent
-  );
-  transform: skewX(-20deg);
-  animation: shine 2.5s infinite;
-}
-
-@keyframes shine {
-  0% { left: -75%; }
-  100% { left: 125%; }
-}
-
-.footer {
-  position: fixed;
-  bottom: 15px;
-  width: 100%;
-  text-align: center;
-  font-size: 11px;
-  color: var(--muted);
+a{
+  display:inline-block;
+  margin:10px;
+  padding:10px 20px;
+  border-radius:10px;
+  background:#6366f1;
+  color:#fff;
+  text-decoration:none;
 }
 </style>
 </head>
-
 <body>
-<div class="wrapper">
-  <div class="header">
-    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br>KARENA PROTECT AKTIF</h1>
-  </div>
-
+<div class="box">
   <div class="avatar"></div>
-
-  <div class="quote">
-    "Ngapain kau ngintip panel orang?<br>
-    Kau bukan pemilik aslinya.<br>
-    Hal kecil bisa jadi kejahatan besar."
-  </div>
-
-  <div class="player">
-    <audio controls autoplay>
-      <source src="https://files.catbox.moe/6sbur8.mpeg" type="audio/mpeg">
-    </audio>
-  </div>
-
-  <div class="buttons">
-    <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
-    <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
-  </div>
-</div>
-
-<div class="footer">
-  Copyright By RezzX • Panel Pterodactyl Protect
+  <h2>🚫 NODE DIPROTEK</h2>
+  <p>Kamu tidak punya akses ke menu node</p>
+  <a href="$DOMAIN/admin">BACK</a>
+  <a href="$URL_WA">CHAT ADMIN</a>
 </div>
 </body>
 </html>
 HTML
 
-chmod 644 "$CONTROLLER"
-chmod 644 "$VIEW_FILE"
-chmod 755 "$VIEW_PATH"
+# ================= CONTROLLER PATCH (AMAN) =================
+grep -q "protect-node" "$CONTROLLER" || sed -i '/public function index(/a\
+        if (!auth()->check() || auth()->id() !== 1) {\
+            return response()->view("errors.protect-node", [], 403);\
+        }\
+' "$CONTROLLER"
 
-echo "🔒 PROTECT BY REZZX NODE AKTIF (FINAL • NON-BYPASS )"
+# ================= PERMISSION =================
+chmod 644 "$VIEW_FILE"
+
+# ================= CLEAR CACHE =================
+cd "$PANEL_PATH" || exit 1
+php artisan view:clear
+php artisan route:clear
+php artisan config:clear
+
+echo "✅ PROTECT NODE AKTIF & STABIL"
