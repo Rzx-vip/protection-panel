@@ -85,10 +85,14 @@ cat > "$ERROR_VIEW" << HTML
   --bg: #0b1220;
   --text: #cbd5e1;
   --muted: #64748b;
+  --accent: #38bdf8;
   --danger: #ef4444;
 }
 
-* { box-sizing: border-box; font-family: "Segoe UI", sans-serif; }
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
 
 body {
   margin: 0;
@@ -100,7 +104,28 @@ body {
   color: var(--text);
 }
 
-.wrapper { text-align: center; padding: 20px; }
+.wrapper {
+  text-align: center;
+  width: 100%;
+  padding: 20px;
+}
+
+.header {
+  opacity: .85;
+  margin-bottom: 40px;
+}
+
+.header span {
+  font-size: 26px;
+  color: var(--danger);
+  margin-right: 8px;
+}
+
+.header h1 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
 
 .avatar {
   width: 130px;
@@ -109,28 +134,111 @@ body {
   border-radius: 50%;
   background: url("$AVATAR_URL") center/cover no-repeat;
   box-shadow: 0 0 25px rgba(99,102,241,.6);
+  border: 3px solid #020617;
+}
+
+.quote {
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 320px;
+  margin: 10px auto 18px;
+  line-height: 1.5;
+}
+
+.player {
+  background: #fff;
+  color: #000;
+  border-radius: 30px;
+  padding: 10px 15px;
+  max-width: 330px;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.4);
+}
+
+audio {
+  width: 100%;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
 }
 
 .btn {
-  display: inline-block;
-  margin: 10px;
+  position: relative;
   padding: 12px 22px;
+  font-weight: bold;
   border-radius: 12px;
-  color: #fff;
   text-decoration: none;
+  color: #fff;
   background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  box-shadow: 0 0 18px rgba(56,189,248,.6);
+  overflow: hidden;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,.7),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: shine 2.5s infinite;
+}
+
+@keyframes shine {
+  0% { left: -75%; }
+  100% { left: 125%; }
+}
+
+.footer {
+  position: fixed;
+  bottom: 15px;
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
 }
 </style>
 </head>
 
 <body>
 <div class="wrapper">
-  <h2>🚫 403 | NODE TERPROTEKSI</h2>
-  <div class="avatar"></div>
-  <p>Hanya OWNER PANEL yang boleh akses Nodes</p>
+  <div class="header">
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br>KARENA PROTECT AKTIF</h1>
+  </div>
 
-  <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
-  <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
+  <div class="avatar"></div>
+
+  <div class="quote">
+    "Ngapain kau ngintip panel orang?<br>
+    Kau bukan pemilik aslinya.<br>
+    Hal kecil bisa jadi kejahatan besar."
+  </div>
+
+  <div class="player">
+    <audio controls autoplay>
+      <source src="https://files.catbox.moe/6sbur8.mpeg" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="buttons">
+    <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
+    <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
+  </div>
+</div>
+
+<div class="footer">
+  Copyright By RezzX • Panel Pterodactyl Protect
 </div>
 </body>
 </html>
