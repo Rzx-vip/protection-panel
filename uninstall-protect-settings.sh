@@ -2,38 +2,54 @@
 set -e
 
 PANEL="/var/www/pterodactyl"
-SETTINGS_DIR="$PANEL/app/Http/Controllers/Admin/Settings"
-ERROR_VIEW="$PANEL/resources/views/errors/403.blade.php"
+SETTINGS="$PANEL/app/Http/Controllers/Admin/Settings"
 
-echo "🧹 UNINSTALL PROTECT SETTINGS (FULL CLEAN MODE)"
+echo "🔥 NUKING PROTECT SETTINGS (FULL RESET MODE)"
 
-# ================= RESTORE BACKUPS =================
-restore_latest () {
-  FILE="$1"
-  BACKUP=$(ls "$FILE".bak_* 2>/dev/null | tail -n 1)
-
-  if [ -f "$BACKUP" ]; then
-    mv "$BACKUP" "$FILE"
-    echo "♻️ Restored: $(basename "$FILE")"
-  else
-    echo "⚠️ No backup found for $(basename "$FILE")"
-  fi
-}
-
-restore_latest "$SETTINGS_DIR/IndexController.php"
-restore_latest "$SETTINGS_DIR/MailController.php"
-restore_latest "$SETTINGS_DIR/AdvancedController.php"
-
-# ================= REMOVE CUSTOM 403 VIEW =================
-if [ -f "$ERROR_VIEW" ]; then
-  rm -f "$ERROR_VIEW"
-  echo "🗑️ Removed custom 403 view"
+# ================= SAFETY =================
+if [ ! -d "$PANEL" ]; then
+  echo "❌ PANEL PATH TIDAK ADA"
+  exit 1
 fi
 
-# ================= CLEAR CACHE =================
 cd "$PANEL"
-php artisan optimize:clear
 
-echo "✅ UNINSTALL PROTECT SETTINGS SELESAI"
-echo "🔓 SETTINGS SUDAH NORMAL"
-echo "♻️ ID 1, 2, 3 SEMUA BISA BUKA SETTINGS"
+# ================= STEP 1: DELETE SETTINGS CONTROLLERS =================
+echo "🧹 Removing broken Settings controllers..."
+
+rm -rf "$SETTINGS"
+
+# ================= STEP 2: RESTORE FROM GIT =================
+if [ -d ".git" ]; then
+  echo "🔄 Git detected — restoring original files"
+  git checkout -- app/Http/Controllers/Admin/Settings
+else
+  echo "❌ PANEL BUKAN GIT INSTALL"
+  echo "📦 Downloading official Settings controllers..."
+
+  mkdir -p "$SETTINGS"
+
+  curl -fsSL https://raw.githubusercontent.com/pterodactyl/panel/develop/app/Http/Controllers/Admin/Settings/IndexController.php \
+    -o "$SETTINGS/IndexController.php"
+
+  curl -fsSL https://raw.githubusercontent.com/pterodactyl/panel/develop/app/Http/Controllers/Admin/Settings/MailController.php \
+    -o "$SETTINGS/MailController.php"
+
+  curl -fsSL https://raw.githubusercontent.com/pterodactyl/panel/develop/app/Http/Controllers/Admin/Settings/AdvancedController.php \
+    -o "$SETTINGS/AdvancedController.php"
+fi
+
+chmod -R 644 "$SETTINGS"
+
+# ================= STEP 3: REMOVE CUSTOM ERROR VIEW =================
+rm -f "$PANEL/resources/views/errors/403.blade.php"
+
+# ================= STEP 4: CLEAR ALL CACHES =================
+php artisan optimize:clear
+php artisan view:clear
+php artisan route:clear
+php artisan config:clear
+
+echo "✅ SETTINGS CONTROLLER RESET SELESAI"
+echo "🔓 /admin/settings SUDAH NORMAL"
+echo "❌ 500 ERROR MUSNAH"
