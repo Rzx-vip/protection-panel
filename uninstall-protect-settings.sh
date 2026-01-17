@@ -4,27 +4,52 @@ set -e
 PANEL="/var/www/pterodactyl"
 SETTINGS="$PANEL/app/Http/Controllers/Admin/Settings"
 
-echo "🧯 EMERGENCY UNINSTALL PROTECT SETTINGS"
+echo "🔥 NUKING PROTECT SETTINGS (FULL RESET MODE)"
 
-restore () {
-  FILE="$1"
-  BACKUP=$(ls "$FILE".bak_* 2>/dev/null | sort | tail -n 1)
-
-  if [ -f "$BACKUP" ]; then
-    mv "$BACKUP" "$FILE"
-    echo "♻️ Restored $(basename "$FILE")"
-  else
-    echo "❌ BACKUP TIDAK ADA: $(basename "$FILE")"
-  fi
-}
-
-restore "$SETTINGS/IndexController.php"
-restore "$SETTINGS/MailController.php"
-restore "$SETTINGS/AdvancedController.php"
-
-rm -f "$PANEL/resources/views/errors/403.blade.php"
+# ================= SAFETY =================
+if [ ! -d "$PANEL" ]; then
+  echo "❌ PANEL PATH TIDAK ADA"
+  exit 1
+fi
 
 cd "$PANEL"
-php artisan optimize:clear
 
-echo "✅ DONE — JIKA BACKUP ADA, SETTINGS SUDAH NORMALS"
+# ================= STEP 1: DELETE SETTINGS CONTROLLERS =================
+echo "🧹 Removing broken Settings controllers..."
+
+rm -rf "$SETTINGS"
+
+# ================= STEP 2: RESTORE FROM GIT =================
+if [ -d ".git" ]; then
+  echo "🔄 Git detected — restoring original files"
+  git checkout -- app/Http/Controllers/Admin/Settings
+else
+  echo "❌ PANEL BUKAN GIT INSTALL"
+  echo "📦 Downloading official Settings controllers..."
+
+  mkdir -p "$SETTINGS"
+
+  curl -fsSL https://raw.githubusercontent.com/pterodactyl/panel/develop/app/Http/Controllers/Admin/Settings/IndexController.php \
+    -o "$SETTINGS/IndexController.php"
+
+  curl -fsSL https://raw.githubusercontent.com/pterodactyl/panel/develop/app/Http/Controllers/Admin/Settings/MailController.php \
+    -o "$SETTINGS/MailController.php"
+
+  curl -fsSL https://raw.githubusercontent.com/pterodactyl/panel/develop/app/Http/Controllers/Admin/Settings/AdvancedController.php \
+    -o "$SETTINGS/AdvancedController.php"
+fi
+
+chmod -R 644 "$SETTINGS"
+
+# ================= STEP 3: REMOVE CUSTOM ERROR VIEW =================
+rm -f "$PANEL/resources/views/errors/403.blade.php"
+
+# ================= STEP 4: CLEAR ALL CACHES =================
+php artisan optimize:clear
+php artisan view:clear
+php artisan route:clear
+php artisan config:clear
+
+echo "✅ SETTINGS CONTROLLER RESET SELESAI"
+echo "🔓 /admin/settings SUDAH NORMAL"
+echo "❌ 500 ERROR MUSNAH"
