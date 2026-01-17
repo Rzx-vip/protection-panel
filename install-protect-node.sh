@@ -320,7 +320,7 @@ audio {
 
   <div class="buttons">
    <a class="btn" href="">⬅ BACK</a>
-    <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
+    <a class="btn" href="${URL_WA}">💬 CHAT ADMIN</a>
   </div>
 
 </div>
@@ -558,7 +558,7 @@ audio {
 
   <div class="buttons">
    <a class="btn" href="">⬅ BACK</a>
-    <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
+  <a class="btn" href="${URL_WA}">💬 CHAT ADMIN</a>
   </div>
 
 </div>
@@ -779,7 +779,7 @@ audio {
 
   <div class="buttons">
    <a class="btn" href="">⬅ BACK</a>
-    <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
+   <a class="btn" href="${URL_WA}">💬 CHAT ADMIN</a>
   </div>
 
 </div>
@@ -997,7 +997,7 @@ audio {
 
   <div class="buttons">
    <a class="btn" href="">⬅ BACK</a>
-    <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
+    <a class="btn" href="${URL_WA}">💬 CHAT ADMIN</a>
   </div>
 
 </div>
@@ -1215,7 +1215,7 @@ audio {
 
   <div class="buttons">
    <a class="btn" href="">⬅ BACK</a>
-    <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
+    <a class="btn" href="${URL_WA}">💬 CHAT ADMIN</a>
   </div>
 
 </div>
@@ -1434,7 +1434,7 @@ audio {
 
   <div class="buttons">
    <a class="btn" href="">⬅ BACK</a>
-    <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
+    <a class="btn" href="${URL_WA}">💬 CHAT ADMIN</a>
   </div>
 
 </div>
