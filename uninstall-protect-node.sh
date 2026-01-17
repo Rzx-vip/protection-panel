@@ -1,35 +1,40 @@
 #!/bin/bash
 
-# ================= CONFIG =================
 PANEL_PATH="/var/www/pterodactyl"
-CONTROLLER="$PANEL_PATH/app/Http/Controllers/Admin/Nodes/NodeController.php"
-VIEW_PATH="$PANEL_PATH/resources/views/errors"
-VIEW_FILE="$VIEW_PATH/protect-node.blade.php"
 
-echo "🧹 Uninstalling PROTECT NODE..."
+MIDDLEWARE="$PANEL_PATH/app/Http/Middleware/ProtectNode.php"
+KERNEL="$PANEL_PATH/app/Http/Kernel.php"
+ERROR_VIEW="$PANEL_PATH/resources/views/errors/403.blade.php"
 
-# ================= RESTORE CONTROLLER =================
-LATEST_BACKUP=$(ls -t "$CONTROLLER".bak_* 2>/dev/null | head -n 1)
+echo "🧹 UNINSTALL PROTECT NODE (EMERGENCY MODE)"
 
-if [ -z "$LATEST_BACKUP" ]; then
-  echo "❌ Backup controller tidak ditemukan"
+# ================= REMOVE MIDDLEWARE FILE =================
+if [ -f "$MIDDLEWARE" ]; then
+  rm -f "$MIDDLEWARE"
+  echo "✅ Middleware ProtectNode dihapus"
 else
-  cp "$LATEST_BACKUP" "$CONTROLLER"
-  echo "✅ Controller berhasil direstore dari:"
-  echo "📦 $LATEST_BACKUP"
+  echo "ℹ️ Middleware tidak ditemukan"
 fi
 
-# ================= REMOVE VIEW =================
-if [ -f "$VIEW_FILE" ]; then
-  rm -f "$VIEW_FILE"
-  echo "🗑 View protect-node dihapus"
+# ================= UNREGISTER FROM KERNEL =================
+if grep -q "ProtectNode::class" "$KERNEL"; then
+  sed -i "/ProtectNode::class/d" "$KERNEL"
+  echo "✅ Middleware dilepas dari Kernel.php"
 else
-  echo "ℹ View protect-node tidak ditemukan"
+  echo "ℹ️ Kernel sudah bersih"
 fi
 
-# ================= PERMISSION =================
-chmod 644 "$CONTROLLER" 2>/dev/null
-chmod -R 755 "$VIEW_PATH" 2>/dev/null
+# ================= REMOVE CUSTOM 403 VIEW =================
+if [ -f "$ERROR_VIEW" ]; then
+  rm -f "$ERROR_VIEW"
+  echo "✅ Custom 403 view dihapus"
+else
+  echo "ℹ️ 403 view tidak ditemukan"
+fi
 
-echo "✅ PROTECT NODE BERHASIL DIUNINSTALL"
-echo "🔓 Semua admin bisa akses Nodes kembali"
+# ================= CLEAR ALL CACHE =================
+cd "$PANEL_PATH" || exit
+php artisan optimize:clear
+
+echo "🎉 UNINSTALL SELESAI"
+echo "🔓 PANEL KEMBALI NORMAL"
