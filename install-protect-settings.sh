@@ -16,22 +16,24 @@ if [ -z "$DOMAIN" ] || [ -z "$WA" ]; then
   exit 1
 fi
 
-echo "🚀 INSTALL PROTECT SETTINGS (NO ROUTE TOUCH • NO 500)"
+echo "🚀 INSTALL PROTECT SETTINGS (FINAL • NO 500)"
 
 # ================= BACKUP =================
 cp "$PROVIDER" "$PROVIDER.bak_$(date +%s)"
 
-# ================= PATCH PROVIDER =================
+# ================= SAFE PATCH =================
 if ! grep -q "PROTECT_SETTINGS_REZZX" "$PROVIDER"; then
-sed -i "/public function boot()/a\\
+  sed -i "/public function boot()/,/^    }/c\\
+    public function boot()\\
+    {\\
         // === PROTECT_SETTINGS_REZZX ===\\
         if (request()->is('admin/settings*')) {\\
             \$user = auth()->user();\\
             if (!\$user || \$user->id !== 1) {\\
                 abort(403);\\
             }\\
-        }
-" "$PROVIDER"
+        }\\
+    }" "$PROVIDER"
 fi
 
 # ================= ERROR HTML =================
@@ -69,7 +71,7 @@ background:linear-gradient(135deg,#0ea5e9,#6366f1)
 <div class="box">
 <div class="avatar"></div>
 <h2>🚫 $CODE | SETTINGS DIPROTEK</h2>
-<p>Akses dibatasi oleh sistem proteksi panel.</p>
+<p>Akses hanya untuk OWNER PANEL</p>
 <a href="$DOMAIN/admin">⬅ Kembali</a><br><br>
 <a href="$WA">💬 Hubungi Admin</a>
 </div>
@@ -84,6 +86,6 @@ php artisan optimize:clear
 php artisan view:clear
 php artisan config:clear
 
-echo "✅ PROTECT SETTINGS AKTIF"
+echo "✅ PROTECT SETTINGS AKTIFS"
 echo "🔒 /admin/settings*"
-echo "🛡️ NO ROUTE TOUCH • NO 500 • NO BYPASS"
+echo "🛡️ NO BYPASS • NO 500 • SAFE PATCH"
