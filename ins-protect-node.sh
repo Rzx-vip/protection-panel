@@ -10,9 +10,9 @@ ERROR_VIEW="$PANEL/resources/views/errors/403.blade.php"
 
 DOMAIN="$1"
 URL_WA="$2"
-AVATAR="$3"
+AVATAR_URL="$3"
 
-[ -z "$AVATAR" ] && AVATAR="https://files.catbox.moe/1s2o5m.jpg"
+[ -z "$AVATAR_URL" ] && AVATAR_URL="https://files.catbox.moe/1s2o5m.jpg"
 
 if [ -z "$DOMAIN" ] || [ -z "$URL_WA" ]; then
   echo "PAKAI: bash install.sh https://panel.com https://wa.me/628xxx"
