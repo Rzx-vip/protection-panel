@@ -15,22 +15,20 @@ TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 # ================= VALIDATION =================
 if [ -z "$DOMAIN" ] || [ -z "$URL_WA" ]; then
   echo "❌ PARAMETER TIDAK LENGKAP"
-  echo "📌 Contoh:"
-  echo "bash install-protect-node.sh https://panel.example.com https://wa.me/62812345678 https://file.catbox.moe/avatar.png"
   exit 1
 fi
 
 [ -z "$AVATAR_URL" ] && AVATAR_URL="$DEFAULT_AVATAR"
 
-echo "🚀 Installing PROTECT NODE (STABLE MODE)"
+echo "🚀 Installing PROTECT NODE (NO BYPASS MODE)"
 
-# ================= BACKUP CONTROLLER =================
+# ================= BACKUP =================
 if [ -f "$CONTROLLER" ]; then
   cp "$CONTROLLER" "$CONTROLLER.bak_$TIMESTAMP"
   echo "📦 Backup NodeController dibuat"
 fi
 
-# ================= NODE CONTROLLER (WORKING VERSION) =================
+# ================= NODE CONTROLLER (FULL FIX) =================
 cat > "$CONTROLLER" << 'PHP'
 <?php
 
@@ -46,17 +44,17 @@ use Illuminate\Contracts\View\Factory as ViewFactory;
 
 class NodeController extends Controller
 {
-    public function __construct(private ViewFactory $view) {}
-
-    public function index(Request $request): View
+    public function __construct(private ViewFactory $view)
     {
+        // 🔒 GLOBAL NODE PROTECTION (ANTI BYPASS)
         $user = Auth::user();
-
-        // 🔒 PROTECT NODE (AMAN, NO 500)
         if (!$user || $user->id !== 1) {
             abort(403);
         }
+    }
 
+    public function index(Request $request): View
+    {
         $nodes = QueryBuilder::for(
             Node::query()->with('location')->withCount('servers')
         )
@@ -69,7 +67,7 @@ class NodeController extends Controller
 }
 PHP
 
-# ================= CUSTOM 403 VIEW (HTML LU PERSIS) =================
+# ================= CUSTOM 403 VIEW =================
 mkdir -p "$(dirname "$ERROR_VIEW")"
 
 cat > "$ERROR_VIEW" << HTML
@@ -77,168 +75,59 @@ cat > "$ERROR_VIEW" << HTML
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>403 | Protect Panel RezzX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-:root {
-  --bg: #0b1220;
-  --text: #cbd5e1;
-  --muted: #64748b;
-  --accent: #38bdf8;
-  --danger: #ef4444;
-}
-
-* {
-  box-sizing: border-box;
-  font-family: "Segoe UI", sans-serif;
-}
-
 body {
   margin: 0;
-  background: radial-gradient(circle at top, #0f172a, var(--bg));
-  min-height: 100vh;
+  background: #020617;
+  color: #e5e7eb;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--text);
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
 }
-
-.wrapper {
+.box {
   text-align: center;
-  width: 100%;
-  padding: 20px;
+  max-width: 360px;
 }
-
-.header {
-  opacity: .85;
-  margin-bottom: 40px;
-}
-
-.header span {
-  font-size: 26px;
-  color: var(--danger);
-  margin-right: 8px;
-}
-
-.header h1 {
-  font-size: 18px;
-  font-weight: 500;
-  margin: 0;
-}
-
 .avatar {
-  width: 130px;
-  height: 130px;
-  margin: 0 auto 15px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   background: url("$AVATAR_URL") center/cover no-repeat;
-  box-shadow: 0 0 25px rgba(99,102,241,.6);
-  border: 3px solid #020617;
-}
-
-.quote {
-  font-size: 13px;
-  color: var(--muted);
-  max-width: 320px;
-  margin: 10px auto 18px;
-  line-height: 1.5;
-}
-
-.player {
-  background: #fff;
-  color: #000;
-  border-radius: 30px;
-  padding: 10px 15px;
-  max-width: 330px;
   margin: 0 auto 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,.4);
+  box-shadow: 0 0 25px rgba(56,189,248,.6);
 }
-
-audio {
-  width: 100%;
+h1 {
+  font-size: 18px;
+  margin-bottom: 12px;
 }
-
-.buttons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 15px;
+p {
+  font-size: 13px;
+  color: #94a3b8;
 }
-
-.btn {
-  position: relative;
-  padding: 12px 22px;
-  font-weight: bold;
-  border-radius: 12px;
+a {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 18px;
+  border-radius: 10px;
   text-decoration: none;
   color: #fff;
-  background: linear-gradient(135deg, #0ea5e9, #6366f1);
-  box-shadow: 0 0 18px rgba(56,189,248,.6);
-  overflow: hidden;
-}
-
-.btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -75%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(
-    120deg,
-    transparent,
-    rgba(255,255,255,.7),
-    transparent
-  );
-  transform: skewX(-20deg);
-  animation: shine 2.5s infinite;
-}
-
-@keyframes shine {
-  0% { left: -75%; }
-  100% { left: 125%; }
-}
-
-.footer {
-  position: fixed;
-  bottom: 15px;
-  width: 100%;
-  text-align: center;
-  font-size: 11px;
-  color: var(--muted);
+  background: linear-gradient(135deg,#0ea5e9,#6366f1);
 }
 </style>
 </head>
-
 <body>
-<div class="wrapper">
-  <div class="header">
-    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br>KARENA PROTECT AKTIF</h1>
-  </div>
-
+<div class="box">
   <div class="avatar"></div>
-
-  <div class="quote">
-    "Ngapain kau ngintip panel orang?<br>
-    Kau bukan pemilik aslinya.<br>
-    Hal kecil bisa jadi kejahatan besar."
-  </div>
-
-  <div class="player">
-    <audio controls autoplay>
-      <source src="https://files.catbox.moe/6sbur8.mpeg" type="audio/mpeg">
-    </audio>
-  </div>
-
-  <div class="buttons">
-    <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
-    <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
-  </div>
-</div>
-
-<div class="footer">
-  Copyright By RezzX • Panel Pterodactyl Protect
+  <h1>🚫 403 | NODE DIPROTEK</h1>
+  <p>Akses Nodes hanya untuk Admin Utama</p>
+  <a href="$DOMAIN/admin">⬅ Kembali</a>
+  <br><br>
+  <a href="$URL_WA">💬 Hubungi Admin</a>
 </div>
 </body>
 </html>
@@ -249,10 +138,10 @@ cd "$PANEL_PATH" || exit
 php artisan view:clear
 php artisan route:clear
 php artisan config:clear
+php artisan optimize:clear
 
 chmod 644 "$CONTROLLER"
 chmod 644 "$ERROR_VIEW"
 
 echo "✅ PROTECT NODE AKTIF"
-echo "🔒 Hanya USER ID 1 bisa buka Nodes"
-echo "🧠 Menu lain NORMAL • NO 500 • NO BYPASS"
+echo "🔒 SEMUA URL NODE TERKUNCI"
