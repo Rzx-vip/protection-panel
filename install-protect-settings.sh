@@ -2,9 +2,11 @@
 set -e
 
 PANEL="/var/www/pterodactyl"
-SETTINGS="$PANEL/app/Http/Controllers/Admin/Settings"
-ERROR_VIEW="$PANEL/resources/views/errors/403.blade.php"
-TS=$(date +"%Y%m%d_%H%M%S")
+MIDDLEWARE="$PANEL/app/Http/Middleware/OwnerOnlySettings.php"
+KERNEL="$PANEL/app/Http/Kernel.php"
+ROUTES="$PANEL/routes/admin.php"
+ERROR403="$PANEL/resources/views/errors/403.blade.php"
+ERROR500="$PANEL/resources/views/errors/500.blade.php"
 
 DOMAIN="$1"
 WA="$2"
@@ -17,78 +19,87 @@ if [ -z "$DOMAIN" ] || [ -z "$WA" ]; then
   exit 1
 fi
 
-echo "🚀 INSTALL PROTECT SETTINGS (OWNER ONLY)"
+echo "🚀 INSTALL PROTECT SETTINGS (SAFE • NO 500)"
 
-# ================= CUSTOM 403 VIEW =================
-mkdir -p "$(dirname "$ERROR_VIEW")"
-cat > "$ERROR_VIEW" << HTML
+# ================= MIDDLEWARE =================
+cat > "$MIDDLEWARE" << 'PHP'
+<?php
+
+namespace Pterodactyl\Http\Middleware;
+
+use Closure;
+use Illuminate\Support\Facades\Auth;
+
+class OwnerOnlySettings
+{
+    public function handle($request, Closure $next)
+    {
+        $user = Auth::user();
+        if (!$user || $user->id !== 1) {
+            abort(403);
+        }
+        return $next($request);
+    }
+}
+PHP
+
+# ================= REGISTER MIDDLEWARE =================
+if ! grep -q "OwnerOnlySettings" "$KERNEL"; then
+  sed -i "/routeMiddleware = \[/a\\
+        'owner.settings' => \\\\Pterodactyl\\\\Http\\\\Middleware\\\\OwnerOnlySettings::class,
+" "$KERNEL"
+fi
+
+# ================= PROTECT ROUTES =================
+if ! grep -q "owner.settings" "$ROUTES"; then
+  sed -i "/Route::group(\\[.*admin.*\\], function/a\\
+    Route::middleware('owner.settings')->group(function () {\\
+        Route::get('/settings', 'Settings\\\\IndexController@index');\\
+        Route::post('/settings', 'Settings\\\\IndexController@update');\\
+        Route::get('/settings/mail', 'Settings\\\\MailController@index');\\
+        Route::get('/settings/advanced', 'Settings\\\\AdvancedController@index');\\
+    });
+" "$ROUTES"
+fi
+
+# ================= ERROR HTML (403 & 500) =================
+mkdir -p "$(dirname "$ERROR403")"
+
+for ERR in 403 500; do
+cat > "$PANEL/resources/views/errors/$ERR.blade.php" << HTML
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>403 | Protect Panel RezzX</title>
+<title>$ERR | Protect Panel RezzX</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{
-margin:0;background:#020617;color:#e5e7eb;
-display:flex;align-items:center;justify-content:center;
-height:100vh;font-family:Segoe UI,sans-serif
-}
+body{margin:0;background:#020617;color:#e5e7eb;
+display:flex;justify-content:center;align-items:center;height:100vh;
+font-family:Segoe UI,sans-serif}
 .box{text-align:center;max-width:360px}
-.avatar{
-width:120px;height:120px;border-radius:50%;
+.avatar{width:120px;height:120px;border-radius:50%;
 background:url("$AVATAR") center/cover no-repeat;
 margin:0 auto 20px;
-box-shadow:0 0 30px rgba(56,189,248,.7)
-}
+box-shadow:0 0 30px rgba(56,189,248,.7)}
+a{display:inline-block;margin-top:14px;padding:10px 18px;
+border-radius:10px;background:linear-gradient(135deg,#0ea5e9,#6366f1);
+color:#fff;text-decoration:none}
 p{font-size:13px;color:#94a3b8}
-a{
-display:inline-block;margin-top:14px;
-padding:10px 18px;border-radius:10px;
-background:linear-gradient(135deg,#0ea5e9,#6366f1);
-color:#fff;text-decoration:none
-}
 </style>
 </head>
 <body>
 <div class="box">
 <div class="avatar"></div>
-<h2>🚫 SETTINGS TERKUNCI</h2>
-<p>Hanya Owner Panel (ID 1)</p>
+<h2>🚫 AKSES DITOLAK</h2>
+<p>Menu ini hanya untuk Owner Panel</p>
 <a href="$DOMAIN/admin">⬅ Kembali</a><br><br>
 <a href="$WA">💬 Hubungi Owner</a>
 </div>
 </body>
 </html>
 HTML
-
-# ================= FUNCTION PATCH =================
-patch_controller () {
-  FILE="$1"
-
-  if [ ! -f "$FILE" ]; then
-    echo "⚠️ SKIP (tidak ada): $FILE"
-    return
-  fi
-
-  cp "$FILE" "$FILE.bak_$TS"
-  echo "🔒 PATCHING: $FILE"
-
-  sed -i "/function index/a\\
-        \\$user = \\\\Illuminate\\\\Support\\\\Facades\\\\Auth::user();\\
-        if (!\\$user || \\$user->id !== 1) { abort(403); }\\
-" "$FILE"
-
-  sed -i "/function update/a\\
-        \\$user = \\\\Illuminate\\\\Support\\\\Facades\\\\Auth::user();\\
-        if (!\\$user || \\$user->id !== 1) { abort(403); }\\
-" "$FILE"
-}
-
-# ================= PATCH REAL FILES =================
-patch_controller "$SETTINGS/IndexController.php"
-patch_controller "$SETTINGS/AdvancedController.php"
-patch_controller "$SETTINGS/Mail/MailController.php"
+done
 
 # ================= CLEAR CACHE =================
 cd "$PANEL"
@@ -98,4 +109,4 @@ echo "✅ PROTECT SETTINGS AKTIF"
 echo "🔒 /admin/settings"
 echo "🔒 /admin/settings/mail"
 echo "🔒 /admin/settings/advanced"
-echo "👑 HANYA USER ID 1"
+echo "🛡️ ANTI BYPASS • ANTI 500"
