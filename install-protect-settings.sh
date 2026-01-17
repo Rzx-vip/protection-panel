@@ -217,7 +217,7 @@ audio {
 <div class="wrapper">
 
   <div class="header">
-    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA SETTINGS<br> KARENA PROTECT AKTIF</h1>
   </div>
 
   <div class="avatar"></div>
