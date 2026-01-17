@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # ================= CONFIG ==================
 PANEL_PATH="/var/www/pterodactyl"
@@ -20,7 +21,7 @@ fi
 
 [ -z "$AVATAR_URL" ] && AVATAR_URL="$DEFAULT_AVATAR"
 
-echo "🚀 Installing PROTECT NODE (NO BYPASS MODE)"
+echo "🚀 Installing PROTECT NODE (NO BYPASS)"
 
 # ================= BACKUP =================
 if [ -f "$CONTROLLER" ]; then
@@ -28,7 +29,7 @@ if [ -f "$CONTROLLER" ]; then
   echo "📦 Backup NodeController dibuat"
 fi
 
-# ================= NODE CONTROLLER (FULL FIX) =================
+# ================= CONTROLLER =================
 cat > "$CONTROLLER" << 'PHP'
 <?php
 
@@ -46,7 +47,6 @@ class NodeController extends Controller
 {
     public function __construct(private ViewFactory $view)
     {
-        // 🔒 GLOBAL NODE PROTECTION (ANTI BYPASS)
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
             abort(403);
@@ -67,7 +67,7 @@ class NodeController extends Controller
 }
 PHP
 
-# ================= CUSTOM 403 VIEW =================
+# ================= ERROR VIEW =================
 mkdir -p "$(dirname "$ERROR_VIEW")"
 
 cat > "$ERROR_VIEW" << HTML
@@ -75,73 +75,38 @@ cat > "$ERROR_VIEW" << HTML
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>403 | Protect Panel RezzX</title>
+<title>403 | Protect Node</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-body {
-  margin: 0;
-  background: #020617;
-  color: #e5e7eb;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  font-family: "Segoe UI", sans-serif;
-}
-.box {
-  text-align: center;
-  max-width: 360px;
-}
-.avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: url("$AVATAR_URL") center/cover no-repeat;
-  margin: 0 auto 20px;
-  box-shadow: 0 0 25px rgba(56,189,248,.6);
-}
-h1 {
-  font-size: 18px;
-  margin-bottom: 12px;
-}
-p {
-  font-size: 13px;
-  color: #94a3b8;
-}
-a {
-  display: inline-block;
-  margin-top: 20px;
-  padding: 10px 18px;
-  border-radius: 10px;
-  text-decoration: none;
-  color: #fff;
-  background: linear-gradient(135deg,#0ea5e9,#6366f1);
-}
+body{margin:0;background:#020617;color:#e5e7eb;
+display:flex;justify-content:center;align-items:center;
+min-height:100vh;font-family:Segoe UI,sans-serif}
+.box{text-align:center;max-width:360px}
+.avatar{width:120px;height:120px;border-radius:50%;
+background:url("$AVATAR_URL") center/cover no-repeat;
+margin:0 auto 20px;box-shadow:0 0 25px #38bdf8}
+a{display:inline-block;margin-top:16px;
+padding:10px 18px;border-radius:10px;
+color:#fff;text-decoration:none;
+background:linear-gradient(135deg,#0ea5e9,#6366f1)}
 </style>
 </head>
 <body>
 <div class="box">
-  <div class="avatar"></div>
-  <h1>🚫 403 | NODE DIPROTEK</h1>
-  <p>Akses Nodes hanya untuk Admin Utama</p>
-  <a href="$DOMAIN/admin">⬅ Kembali</a>
-  <br><br>
-  <a href="$URL_WA">💬 Hubungi Admin</a>
+<div class="avatar"></div>
+<h3>🚫 403 | NODE DIPROTEK</h3>
+<p>Hanya Admin Utama yang bisa mengakses Node</p>
+<a href="$DOMAIN/admin">⬅ Kembali</a><br><br>
+<a href="$URL_WA">💬 Chat Admin</a>
 </div>
 </body>
 </html>
 HTML
 
 # ================= CLEAR CACHE =================
-cd "$PANEL_PATH" || exit
-php artisan view:clear
-php artisan route:clear
-php artisan config:clear
+cd "$PANEL_PATH"
 php artisan optimize:clear
 
-chmod 644 "$CONTROLLER"
-chmod 644 "$ERROR_VIEW"
+chmod 644 "$CONTROLLER" "$ERROR_VIEW"
 
-echo "✅ PROTECT NODE AKTIF"
-echo "🔒 SEMUA URL NODE TERKUNCI"
+echo "✅ PROTECT NODE AKTIF 100%"
