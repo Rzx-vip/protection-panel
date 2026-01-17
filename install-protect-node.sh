@@ -20,7 +20,7 @@ set -euo pipefail
 BASE_DIR="/var/www/pterodactyl/app/Http/Controllers/Admin/Nodes"
 TIMESTAMP="$(date -u +"%Y-%m-%d-%H-%M-%S")"
 # DOMAIN="$1"
-URL_WA=`${1}`
+URL_WA=`'(${1})'`
 AVATAR="https://i.pinimg.com/736x/9b/77/03/9b7703e7935e9a84f47623d24228bf82.jpg"
 
 [ -z "$AVATAR" ] && AVATAR="https://i.pinimg.com/736x/9b/77/03/9b7703e7935e9a84f47623d24228bf82.jpg"
