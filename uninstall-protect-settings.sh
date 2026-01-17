@@ -1,26 +1,60 @@
 #!/bin/bash
 set -e
 
-REMOTE="/var/www/pterodactyl/app/Http/Controllers/Admin/Settings/IndexController.php"
+PANEL="/var/www/pterodactyl"
 
-echo "🔥 UNINSTALL PROTECT SETTINGS (SAFE RESTORE)"
+MIDDLEWARE="$PANEL/app/Http/Middleware/OwnerOnlySettings.php"
+KERNEL="$PANEL/app/Http/Kernel.php"
+ROUTES="$PANEL/routes/admin.php"
 
-if ls ${REMOTE}.bak_* 1> /dev/null 2>&1; then
-  LAST_BACKUP=$(ls -t ${REMOTE}.bak_* | head -n1)
-  cp "$LAST_BACKUP" "$REMOTE"
-  echo "♻ Restored from backup: $LAST_BACKUP"
+ERROR403="$PANEL/resources/views/errors/403.blade.php"
+ERROR500="$PANEL/resources/views/errors/500.blade.php"
+
+echo "🧹 UNINSTALL PROTECT SETTINGS (FULL CLEAN)"
+
+# ================= REMOVE MIDDLEWARE FILE =================
+if [ -f "$MIDDLEWARE" ]; then
+  rm -f "$MIDDLEWARE"
+  echo "✅ Middleware dihapus"
 else
-  echo "⚠ Backup tidak ditemukan, restore dari repo resmi"
-
-  curl -fsSL \
-    https://raw.githubusercontent.com/pterodactyl/panel/develop/app/Http/Controllers/Admin/Settings/IndexController.php \
-    -o "$REMOTE"
+  echo "⚠️ Middleware tidak ditemukan"
 fi
 
-php artisan optimize:clear
-php artisan view:clear
-php artisan route:clear
-php artisan config:clear
+# ================= REMOVE KERNEL REGISTER =================
+if grep -q "OwnerOnlySettings" "$KERNEL"; then
+  sed -i "/OwnerOnlySettings::class/d" "$KERNEL"
+  sed -i "/owner.settings/d" "$KERNEL"
+  echo "✅ Kernel dibersihkan"
+else
+  echo "⚠️ Kernel sudah bersih"
+fi
 
-echo "✅ SETTINGS NORMAL"
-echo "🔓 500 ERROR HILANG"
+# ================= REMOVE ROUTE PROTECT =================
+if grep -q "owner.settings" "$ROUTES"; then
+  sed -i "/owner.settings/d" "$ROUTES"
+  sed -i "/settings\\\\\\\\AdvancedController/d" "$ROUTES"
+  sed -i "/settings\\\\\\\\MailController/d" "$ROUTES"
+  sed -i "/settings', 'Settings/d" "$ROUTES"
+  echo "✅ Route protect dihapus"
+else
+  echo "⚠️ Route protect tidak ditemukan"
+fi
+
+# ================= REMOVE ERROR HTML =================
+if [ -f "$ERROR403" ]; then
+  rm -f "$ERROR403"
+  echo "✅ 403 custom dihapus"
+fi
+
+if [ -f "$ERROR500" ]; then
+  rm -f "$ERROR500"
+  echo "✅ 500 custom dihapus"
+fi
+
+# ================= CLEAR CACHE =================
+cd "$PANEL"
+php artisan optimize:clear
+
+echo "🎉 UNINSTALL SELESAI"
+echo "🔓 SETTINGS SUDAH NORMAL"
+echo "🚀 PANEL BALIK DEFAULT"
