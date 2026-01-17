@@ -151,111 +151,184 @@ class NodeController extends Controller
     private function denyHtml()
     {
         $html = <<<'HTML'
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Access Denied - Protect Panel By Dezz</title>
-  <style>
-    :root { color-scheme: dark; }
-    body {
-      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-      background: radial-gradient(800px 500px at 20% 20%, rgba(255,0,0,.18), transparent 60%),
-                  radial-gradient(900px 600px at 80% 80%, rgba(0,160,255,.14), transparent 60%),
-                  #07070a;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:#eaeaf2;
-    }
-    .card {
-      width:min(860px, 92vw);
-      border:1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border-radius:18px;
-      box-shadow: 0 20px 80px rgba(0,0,0,.55);
-      overflow:hidden;
-    }
-    .top {
-      padding:22px 22px 14px;
-      display:flex; gap:14px; align-items:center;
-      background: linear-gradient(90deg, rgba(255,0,0,.18), rgba(255,255,255,0));
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .sig {
-      width:44px; height:44px; border-radius:14px;
-      display:grid; place-items:center;
-      background: rgba(255,0,0,.14);
-      border:1px solid rgba(255,0,0,.28);
-      box-shadow: 0 0 0 6px rgba(255,0,0,.06);
-      font-size:22px;
-    }
-    h1 { margin:0; font-size:18px; letter-spacing:.2px; }
-    .sub { margin-top:4px; color: rgba(234,234,242,.72); font-size:13px; }
-    .mid { padding:18px 22px 8px; }
-    .code {
-      margin:14px 0 6px;
-      padding:14px 14px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(0,0,0,.25);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size:13px;
-      color:#f3f3ff;
-      line-height:1.5;
-      overflow:auto;
-    }
-    .pillbar { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-    .pill {
-      font-size:12px; padding:8px 10px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color: rgba(234,234,242,.86);
-    }
-    .bot {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:14px 22px;
-      border-top:1px solid rgba(255,255,255,.06);
-      background: rgba(0,0,0,.18);
-      color: rgba(234,234,242,.70);
-      font-size:12px;
-    }
-    .wm { font-weight:700; color:#fff; }
-    .glow { text-shadow: 0 0 18px rgba(255,0,0,.35); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>403 | Protect Panel RezzX</title>
+
+<style>
+:root {
+  --bg: #0b1220;
+  --text: #cbd5e1;
+  --muted: #64748b;
+  --accent: #38bdf8;
+  --danger: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #0f172a, var(--bg));
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text);
+}
+
+.wrapper {
+  text-align: center;
+  width: 100%;
+  padding: 20px;
+}
+
+/* HEADER */
+.header {
+  opacity: .85;
+  margin-bottom: 40px;
+}
+
+.header span {
+  font-size: 26px;
+  color: var(--danger);
+  margin-right: 8px;
+}
+
+.header h1 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* AVATAR */
+.avatar {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  background: url("$AVATAR") center/cover no-repeat;
+  box-shadow: 0 0 25px rgba(99,102,241,.6);
+  border: 3px solid #020617;
+}
+
+/* QUOTE */
+.quote {
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 320px;
+  margin: 10px auto 18px;
+  line-height: 1.5;
+}
+
+/* PLAYER */
+.player {
+  background: #fff;
+  color: #000;
+  border-radius: 30px;
+  padding: 10px 15px;
+  max-width: 330px;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.4);
+}
+
+audio {
+  width: 100%;
+}
+
+/* BUTTONS */
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.btn {
+  position: relative;
+  padding: 12px 22px;
+  font-weight: bold;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  box-shadow: 0 0 18px rgba(56,189,248,.6);
+  overflow: hidden;
+}
+
+/* SHINE EFFECT */
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,.7),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: shine 2.5s infinite;
+}
+
+@keyframes shine {
+  0% { left: -75%; }
+  100% { left: 125%; }
+}
+
+/* FOOTER */
+.footer {
+  position: fixed;
+  bottom: 15px;
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+</style>
 </head>
+
 <body>
-  <div class="card">
-    <div class="top">
-      <div class="sig">⛔</div>
-      <div>
-        <h1 class="glow">ACCESS DENIED — NODES MODULE LOCKED</h1>
-        <div class="sub">This area is protected. Only <b>Admin ID 1</b> is allowed.</div>
-      </div>
-    </div>
 
-    <div class="mid">
-      <div class="code">
-HTTP/1.1 403 Forbidden<br/>
-Module: Admin / Nodes<br/>
-Rule: Only user_id == 1<br/>
-Action: Request blocked
-      </div>
+<div class="wrapper">
 
-      <div class="pillbar">
-        <div class="pill">/admin/nodes</div>
-        <div class="pill">/admin/nodes/view/*</div>
-        <div class="pill">/admin/nodes/view/*/settings</div>
-        <div class="pill">/admin/nodes/view/*/configuration</div>
-        <div class="pill">/admin/nodes/view/*/allocation</div>
-        <div class="pill">/admin/nodes/view/*/servers</div>
-      </div>
-    </div>
-
-    <div class="bot">
-      <div>Security Layer: <b>Dezz Shield</b> • Status: <span class="glow">ENABLED</span></div>
-      <div class="wm">Protect Panel By Dezz</div>
-    </div>
+  <div class="header">
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
   </div>
+
+  <div class="avatar"></div>
+
+  <div class="quote">
+    "Ngapain kau ngintip panel orang?<br>
+    Kau bukan pemilik aslinya.<br>
+    Hal kecil bisa jadi kejahatan besar."
+  </div>
+
+  <div class="player">
+    <audio controls autoplay>
+      <source src="https://files.catbox.moe/6sbur8.mpeg" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="buttons">
+   <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
+    <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
+  </div>
+
+</div>
+
+<div class="footer">
+  Copyright By RezzX • Panel Pterodactyl Protect
+</div>
+
 </body>
 </html>
 HTML;
@@ -316,111 +389,184 @@ class NodeViewController extends Controller
     private function denyHtml()
     {
         $html = <<<'HTML'
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Access Denied - Protect Panel By Dezz</title>
-  <style>
-    :root { color-scheme: dark; }
-    body {
-      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-      background: radial-gradient(800px 500px at 20% 20%, rgba(255,0,0,.18), transparent 60%),
-                  radial-gradient(900px 600px at 80% 80%, rgba(0,160,255,.14), transparent 60%),
-                  #07070a;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:#eaeaf2;
-    }
-    .card {
-      width:min(860px, 92vw);
-      border:1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border-radius:18px;
-      box-shadow: 0 20px 80px rgba(0,0,0,.55);
-      overflow:hidden;
-    }
-    .top {
-      padding:22px 22px 14px;
-      display:flex; gap:14px; align-items:center;
-      background: linear-gradient(90deg, rgba(255,0,0,.18), rgba(255,255,255,0));
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .sig {
-      width:44px; height:44px; border-radius:14px;
-      display:grid; place-items:center;
-      background: rgba(255,0,0,.14);
-      border:1px solid rgba(255,0,0,.28);
-      box-shadow: 0 0 0 6px rgba(255,0,0,.06);
-      font-size:22px;
-    }
-    h1 { margin:0; font-size:18px; letter-spacing:.2px; }
-    .sub { margin-top:4px; color: rgba(234,234,242,.72); font-size:13px; }
-    .mid { padding:18px 22px 8px; }
-    .code {
-      margin:14px 0 6px;
-      padding:14px 14px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(0,0,0,.25);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size:13px;
-      color:#f3f3ff;
-      line-height:1.5;
-      overflow:auto;
-    }
-    .pillbar { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-    .pill {
-      font-size:12px; padding:8px 10px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color: rgba(234,234,242,.86);
-    }
-    .bot {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:14px 22px;
-      border-top:1px solid rgba(255,255,255,.06);
-      background: rgba(0,0,0,.18);
-      color: rgba(234,234,242,.70);
-      font-size:12px;
-    }
-    .wm { font-weight:700; color:#fff; }
-    .glow { text-shadow: 0 0 18px rgba(255,0,0,.35); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>403 | Protect Panel RezzX</title>
+
+<style>
+:root {
+  --bg: #0b1220;
+  --text: #cbd5e1;
+  --muted: #64748b;
+  --accent: #38bdf8;
+  --danger: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #0f172a, var(--bg));
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text);
+}
+
+.wrapper {
+  text-align: center;
+  width: 100%;
+  padding: 20px;
+}
+
+/* HEADER */
+.header {
+  opacity: .85;
+  margin-bottom: 40px;
+}
+
+.header span {
+  font-size: 26px;
+  color: var(--danger);
+  margin-right: 8px;
+}
+
+.header h1 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* AVATAR */
+.avatar {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  background: url("$AVATAR") center/cover no-repeat;
+  box-shadow: 0 0 25px rgba(99,102,241,.6);
+  border: 3px solid #020617;
+}
+
+/* QUOTE */
+.quote {
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 320px;
+  margin: 10px auto 18px;
+  line-height: 1.5;
+}
+
+/* PLAYER */
+.player {
+  background: #fff;
+  color: #000;
+  border-radius: 30px;
+  padding: 10px 15px;
+  max-width: 330px;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.4);
+}
+
+audio {
+  width: 100%;
+}
+
+/* BUTTONS */
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.btn {
+  position: relative;
+  padding: 12px 22px;
+  font-weight: bold;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  box-shadow: 0 0 18px rgba(56,189,248,.6);
+  overflow: hidden;
+}
+
+/* SHINE EFFECT */
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,.7),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: shine 2.5s infinite;
+}
+
+@keyframes shine {
+  0% { left: -75%; }
+  100% { left: 125%; }
+}
+
+/* FOOTER */
+.footer {
+  position: fixed;
+  bottom: 15px;
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+</style>
 </head>
+
 <body>
-  <div class="card">
-    <div class="top">
-      <div class="sig">⛔</div>
-      <div>
-        <h1 class="glow">ACCESS DENIED — NODES MODULE LOCKED</h1>
-        <div class="sub">This area is protected. Only <b>Admin ID 1</b> is allowed.</div>
-      </div>
-    </div>
 
-    <div class="mid">
-      <div class="code">
-HTTP/1.1 403 Forbidden<br/>
-Module: Admin / Nodes<br/>
-Rule: Only user_id == 1<br/>
-Action: Request blocked
-      </div>
+<div class="wrapper">
 
-      <div class="pillbar">
-        <div class="pill">/admin/nodes</div>
-        <div class="pill">/admin/nodes/view/*</div>
-        <div class="pill">/admin/nodes/view/*/settings</div>
-        <div class="pill">/admin/nodes/view/*/configuration</div>
-        <div class="pill">/admin/nodes/view/*/allocation</div>
-        <div class="pill">/admin/nodes/view/*/servers</div>
-      </div>
-    </div>
-
-    <div class="bot">
-      <div>Security Layer: <b>Dezz Shield</b> • Status: <span class="glow">ENABLED</span></div>
-      <div class="wm">Protect Panel By Dezz</div>
-    </div>
+  <div class="header">
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
   </div>
+
+  <div class="avatar"></div>
+
+  <div class="quote">
+    "Ngapain kau ngintip panel orang?<br>
+    Kau bukan pemilik aslinya.<br>
+    Hal kecil bisa jadi kejahatan besar."
+  </div>
+
+  <div class="player">
+    <audio controls autoplay>
+      <source src="https://files.catbox.moe/6sbur8.mpeg" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="buttons">
+   <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
+    <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
+  </div>
+
+</div>
+
+<div class="footer">
+  Copyright By RezzX • Panel Pterodactyl Protect
+</div>
+
 </body>
 </html>
 HTML;
@@ -464,111 +610,184 @@ class NodeSettingsController extends Controller
     private function denyHtml()
     {
         $html = <<<'HTML'
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Access Denied - Protect Panel By Dezz</title>
-  <style>
-    :root { color-scheme: dark; }
-    body {
-      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-      background: radial-gradient(800px 500px at 20% 20%, rgba(255,0,0,.18), transparent 60%),
-                  radial-gradient(900px 600px at 80% 80%, rgba(0,160,255,.14), transparent 60%),
-                  #07070a;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:#eaeaf2;
-    }
-    .card {
-      width:min(860px, 92vw);
-      border:1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border-radius:18px;
-      box-shadow: 0 20px 80px rgba(0,0,0,.55);
-      overflow:hidden;
-    }
-    .top {
-      padding:22px 22px 14px;
-      display:flex; gap:14px; align-items:center;
-      background: linear-gradient(90deg, rgba(255,0,0,.18), rgba(255,255,255,0));
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .sig {
-      width:44px; height:44px; border-radius:14px;
-      display:grid; place-items:center;
-      background: rgba(255,0,0,.14);
-      border:1px solid rgba(255,0,0,.28);
-      box-shadow: 0 0 0 6px rgba(255,0,0,.06);
-      font-size:22px;
-    }
-    h1 { margin:0; font-size:18px; letter-spacing:.2px; }
-    .sub { margin-top:4px; color: rgba(234,234,242,.72); font-size:13px; }
-    .mid { padding:18px 22px 8px; }
-    .code {
-      margin:14px 0 6px;
-      padding:14px 14px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(0,0,0,.25);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size:13px;
-      color:#f3f3ff;
-      line-height:1.5;
-      overflow:auto;
-    }
-    .pillbar { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-    .pill {
-      font-size:12px; padding:8px 10px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color: rgba(234,234,242,.86);
-    }
-    .bot {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:14px 22px;
-      border-top:1px solid rgba(255,255,255,.06);
-      background: rgba(0,0,0,.18);
-      color: rgba(234,234,242,.70);
-      font-size:12px;
-    }
-    .wm { font-weight:700; color:#fff; }
-    .glow { text-shadow: 0 0 18px rgba(255,0,0,.35); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>403 | Protect Panel RezzX</title>
+
+<style>
+:root {
+  --bg: #0b1220;
+  --text: #cbd5e1;
+  --muted: #64748b;
+  --accent: #38bdf8;
+  --danger: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #0f172a, var(--bg));
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text);
+}
+
+.wrapper {
+  text-align: center;
+  width: 100%;
+  padding: 20px;
+}
+
+/* HEADER */
+.header {
+  opacity: .85;
+  margin-bottom: 40px;
+}
+
+.header span {
+  font-size: 26px;
+  color: var(--danger);
+  margin-right: 8px;
+}
+
+.header h1 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* AVATAR */
+.avatar {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  background: url("$AVATAR") center/cover no-repeat;
+  box-shadow: 0 0 25px rgba(99,102,241,.6);
+  border: 3px solid #020617;
+}
+
+/* QUOTE */
+.quote {
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 320px;
+  margin: 10px auto 18px;
+  line-height: 1.5;
+}
+
+/* PLAYER */
+.player {
+  background: #fff;
+  color: #000;
+  border-radius: 30px;
+  padding: 10px 15px;
+  max-width: 330px;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.4);
+}
+
+audio {
+  width: 100%;
+}
+
+/* BUTTONS */
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.btn {
+  position: relative;
+  padding: 12px 22px;
+  font-weight: bold;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  box-shadow: 0 0 18px rgba(56,189,248,.6);
+  overflow: hidden;
+}
+
+/* SHINE EFFECT */
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,.7),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: shine 2.5s infinite;
+}
+
+@keyframes shine {
+  0% { left: -75%; }
+  100% { left: 125%; }
+}
+
+/* FOOTER */
+.footer {
+  position: fixed;
+  bottom: 15px;
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+</style>
 </head>
+
 <body>
-  <div class="card">
-    <div class="top">
-      <div class="sig">⛔</div>
-      <div>
-        <h1 class="glow">ACCESS DENIED — NODES MODULE LOCKED</h1>
-        <div class="sub">This area is protected. Only <b>Admin ID 1</b> is allowed.</div>
-      </div>
-    </div>
 
-    <div class="mid">
-      <div class="code">
-HTTP/1.1 403 Forbidden<br/>
-Module: Admin / Nodes<br/>
-Rule: Only user_id == 1<br/>
-Action: Request blocked
-      </div>
+<div class="wrapper">
 
-      <div class="pillbar">
-        <div class="pill">/admin/nodes</div>
-        <div class="pill">/admin/nodes/view/*</div>
-        <div class="pill">/admin/nodes/view/*/settings</div>
-        <div class="pill">/admin/nodes/view/*/configuration</div>
-        <div class="pill">/admin/nodes/view/*/allocation</div>
-        <div class="pill">/admin/nodes/view/*/servers</div>
-      </div>
-    </div>
-
-    <div class="bot">
-      <div>Security Layer: <b>Dezz Shield</b> • Status: <span class="glow">ENABLED</span></div>
-      <div class="wm">Protect Panel By Dezz</div>
-    </div>
+  <div class="header">
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
   </div>
+
+  <div class="avatar"></div>
+
+  <div class="quote">
+    "Ngapain kau ngintip panel orang?<br>
+    Kau bukan pemilik aslinya.<br>
+    Hal kecil bisa jadi kejahatan besar."
+  </div>
+
+  <div class="player">
+    <audio controls autoplay>
+      <source src="https://files.catbox.moe/6sbur8.mpeg" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="buttons">
+   <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
+    <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
+  </div>
+
+</div>
+
+<div class="footer">
+  Copyright By RezzX • Panel Pterodactyl Protect
+</div>
+
 </body>
 </html>
 HTML;
@@ -609,111 +828,184 @@ class NodeConfigurationController extends Controller
     private function denyHtml()
     {
         $html = <<<'HTML'
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Access Denied - Protect Panel By Dezz</title>
-  <style>
-    :root { color-scheme: dark; }
-    body {
-      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-      background: radial-gradient(800px 500px at 20% 20%, rgba(255,0,0,.18), transparent 60%),
-                  radial-gradient(900px 600px at 80% 80%, rgba(0,160,255,.14), transparent 60%),
-                  #07070a;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:#eaeaf2;
-    }
-    .card {
-      width:min(860px, 92vw);
-      border:1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border-radius:18px;
-      box-shadow: 0 20px 80px rgba(0,0,0,.55);
-      overflow:hidden;
-    }
-    .top {
-      padding:22px 22px 14px;
-      display:flex; gap:14px; align-items:center;
-      background: linear-gradient(90deg, rgba(255,0,0,.18), rgba(255,255,255,0));
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .sig {
-      width:44px; height:44px; border-radius:14px;
-      display:grid; place-items:center;
-      background: rgba(255,0,0,.14);
-      border:1px solid rgba(255,0,0,.28);
-      box-shadow: 0 0 0 6px rgba(255,0,0,.06);
-      font-size:22px;
-    }
-    h1 { margin:0; font-size:18px; letter-spacing:.2px; }
-    .sub { margin-top:4px; color: rgba(234,234,242,.72); font-size:13px; }
-    .mid { padding:18px 22px 8px; }
-    .code {
-      margin:14px 0 6px;
-      padding:14px 14px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(0,0,0,.25);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size:13px;
-      color:#f3f3ff;
-      line-height:1.5;
-      overflow:auto;
-    }
-    .pillbar { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-    .pill {
-      font-size:12px; padding:8px 10px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color: rgba(234,234,242,.86);
-    }
-    .bot {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:14px 22px;
-      border-top:1px solid rgba(255,255,255,.06);
-      background: rgba(0,0,0,.18);
-      color: rgba(234,234,242,.70);
-      font-size:12px;
-    }
-    .wm { font-weight:700; color:#fff; }
-    .glow { text-shadow: 0 0 18px rgba(255,0,0,.35); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>403 | Protect Panel RezzX</title>
+
+<style>
+:root {
+  --bg: #0b1220;
+  --text: #cbd5e1;
+  --muted: #64748b;
+  --accent: #38bdf8;
+  --danger: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #0f172a, var(--bg));
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text);
+}
+
+.wrapper {
+  text-align: center;
+  width: 100%;
+  padding: 20px;
+}
+
+/* HEADER */
+.header {
+  opacity: .85;
+  margin-bottom: 40px;
+}
+
+.header span {
+  font-size: 26px;
+  color: var(--danger);
+  margin-right: 8px;
+}
+
+.header h1 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* AVATAR */
+.avatar {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  background: url("$AVATAR") center/cover no-repeat;
+  box-shadow: 0 0 25px rgba(99,102,241,.6);
+  border: 3px solid #020617;
+}
+
+/* QUOTE */
+.quote {
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 320px;
+  margin: 10px auto 18px;
+  line-height: 1.5;
+}
+
+/* PLAYER */
+.player {
+  background: #fff;
+  color: #000;
+  border-radius: 30px;
+  padding: 10px 15px;
+  max-width: 330px;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.4);
+}
+
+audio {
+  width: 100%;
+}
+
+/* BUTTONS */
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.btn {
+  position: relative;
+  padding: 12px 22px;
+  font-weight: bold;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  box-shadow: 0 0 18px rgba(56,189,248,.6);
+  overflow: hidden;
+}
+
+/* SHINE EFFECT */
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,.7),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: shine 2.5s infinite;
+}
+
+@keyframes shine {
+  0% { left: -75%; }
+  100% { left: 125%; }
+}
+
+/* FOOTER */
+.footer {
+  position: fixed;
+  bottom: 15px;
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+</style>
 </head>
+
 <body>
-  <div class="card">
-    <div class="top">
-      <div class="sig">⛔</div>
-      <div>
-        <h1 class="glow">ACCESS DENIED — NODES MODULE LOCKED</h1>
-        <div class="sub">This area is protected. Only <b>Admin ID 1</b> is allowed.</div>
-      </div>
-    </div>
 
-    <div class="mid">
-      <div class="code">
-HTTP/1.1 403 Forbidden<br/>
-Module: Admin / Nodes<br/>
-Rule: Only user_id == 1<br/>
-Action: Request blocked
-      </div>
+<div class="wrapper">
 
-      <div class="pillbar">
-        <div class="pill">/admin/nodes</div>
-        <div class="pill">/admin/nodes/view/*</div>
-        <div class="pill">/admin/nodes/view/*/settings</div>
-        <div class="pill">/admin/nodes/view/*/configuration</div>
-        <div class="pill">/admin/nodes/view/*/allocation</div>
-        <div class="pill">/admin/nodes/view/*/servers</div>
-      </div>
-    </div>
-
-    <div class="bot">
-      <div>Security Layer: <b>Dezz Shield</b> • Status: <span class="glow">ENABLED</span></div>
-      <div class="wm">Protect Panel By Dezz</div>
-    </div>
+  <div class="header">
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
   </div>
+
+  <div class="avatar"></div>
+
+  <div class="quote">
+    "Ngapain kau ngintip panel orang?<br>
+    Kau bukan pemilik aslinya.<br>
+    Hal kecil bisa jadi kejahatan besar."
+  </div>
+
+  <div class="player">
+    <audio controls autoplay>
+      <source src="https://files.catbox.moe/6sbur8.mpeg" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="buttons">
+   <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
+    <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
+  </div>
+
+</div>
+
+<div class="footer">
+  Copyright By RezzX • Panel Pterodactyl Protect
+</div>
+
 </body>
 </html>
 HTML;
@@ -754,111 +1046,184 @@ class NodeAllocationController extends Controller
     private function denyHtml()
     {
         $html = <<<'HTML'
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Access Denied - Protect Panel By Dezz</title>
-  <style>
-    :root { color-scheme: dark; }
-    body {
-      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-      background: radial-gradient(800px 500px at 20% 20%, rgba(255,0,0,.18), transparent 60%),
-                  radial-gradient(900px 600px at 80% 80%, rgba(0,160,255,.14), transparent 60%),
-                  #07070a;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:#eaeaf2;
-    }
-    .card {
-      width:min(860px, 92vw);
-      border:1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border-radius:18px;
-      box-shadow: 0 20px 80px rgba(0,0,0,.55);
-      overflow:hidden;
-    }
-    .top {
-      padding:22px 22px 14px;
-      display:flex; gap:14px; align-items:center;
-      background: linear-gradient(90deg, rgba(255,0,0,.18), rgba(255,255,255,0));
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .sig {
-      width:44px; height:44px; border-radius:14px;
-      display:grid; place-items:center;
-      background: rgba(255,0,0,.14);
-      border:1px solid rgba(255,0,0,.28);
-      box-shadow: 0 0 0 6px rgba(255,0,0,.06);
-      font-size:22px;
-    }
-    h1 { margin:0; font-size:18px; letter-spacing:.2px; }
-    .sub { margin-top:4px; color: rgba(234,234,242,.72); font-size:13px; }
-    .mid { padding:18px 22px 8px; }
-    .code {
-      margin:14px 0 6px;
-      padding:14px 14px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(0,0,0,.25);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size:13px;
-      color:#f3f3ff;
-      line-height:1.5;
-      overflow:auto;
-    }
-    .pillbar { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-    .pill {
-      font-size:12px; padding:8px 10px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color: rgba(234,234,242,.86);
-    }
-    .bot {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:14px 22px;
-      border-top:1px solid rgba(255,255,255,.06);
-      background: rgba(0,0,0,.18);
-      color: rgba(234,234,242,.70);
-      font-size:12px;
-    }
-    .wm { font-weight:700; color:#fff; }
-    .glow { text-shadow: 0 0 18px rgba(255,0,0,.35); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>403 | Protect Panel RezzX</title>
+
+<style>
+:root {
+  --bg: #0b1220;
+  --text: #cbd5e1;
+  --muted: #64748b;
+  --accent: #38bdf8;
+  --danger: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #0f172a, var(--bg));
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text);
+}
+
+.wrapper {
+  text-align: center;
+  width: 100%;
+  padding: 20px;
+}
+
+/* HEADER */
+.header {
+  opacity: .85;
+  margin-bottom: 40px;
+}
+
+.header span {
+  font-size: 26px;
+  color: var(--danger);
+  margin-right: 8px;
+}
+
+.header h1 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* AVATAR */
+.avatar {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  background: url("$AVATAR") center/cover no-repeat;
+  box-shadow: 0 0 25px rgba(99,102,241,.6);
+  border: 3px solid #020617;
+}
+
+/* QUOTE */
+.quote {
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 320px;
+  margin: 10px auto 18px;
+  line-height: 1.5;
+}
+
+/* PLAYER */
+.player {
+  background: #fff;
+  color: #000;
+  border-radius: 30px;
+  padding: 10px 15px;
+  max-width: 330px;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.4);
+}
+
+audio {
+  width: 100%;
+}
+
+/* BUTTONS */
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.btn {
+  position: relative;
+  padding: 12px 22px;
+  font-weight: bold;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  box-shadow: 0 0 18px rgba(56,189,248,.6);
+  overflow: hidden;
+}
+
+/* SHINE EFFECT */
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,.7),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: shine 2.5s infinite;
+}
+
+@keyframes shine {
+  0% { left: -75%; }
+  100% { left: 125%; }
+}
+
+/* FOOTER */
+.footer {
+  position: fixed;
+  bottom: 15px;
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+</style>
 </head>
+
 <body>
-  <div class="card">
-    <div class="top">
-      <div class="sig">⛔</div>
-      <div>
-        <h1 class="glow">ACCESS DENIED — NODES MODULE LOCKED</h1>
-        <div class="sub">This area is protected. Only <b>Admin ID 1</b> is allowed.</div>
-      </div>
-    </div>
 
-    <div class="mid">
-      <div class="code">
-HTTP/1.1 403 Forbidden<br/>
-Module: Admin / Nodes<br/>
-Rule: Only user_id == 1<br/>
-Action: Request blocked
-      </div>
+<div class="wrapper">
 
-      <div class="pillbar">
-        <div class="pill">/admin/nodes</div>
-        <div class="pill">/admin/nodes/view/*</div>
-        <div class="pill">/admin/nodes/view/*/settings</div>
-        <div class="pill">/admin/nodes/view/*/configuration</div>
-        <div class="pill">/admin/nodes/view/*/allocation</div>
-        <div class="pill">/admin/nodes/view/*/servers</div>
-      </div>
-    </div>
-
-    <div class="bot">
-      <div>Security Layer: <b>Dezz Shield</b> • Status: <span class="glow">ENABLED</span></div>
-      <div class="wm">Protect Panel By Dezz</div>
-    </div>
+  <div class="header">
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
   </div>
+
+  <div class="avatar"></div>
+
+  <div class="quote">
+    "Ngapain kau ngintip panel orang?<br>
+    Kau bukan pemilik aslinya.<br>
+    Hal kecil bisa jadi kejahatan besar."
+  </div>
+
+  <div class="player">
+    <audio controls autoplay>
+      <source src="https://files.catbox.moe/6sbur8.mpeg" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="buttons">
+   <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
+    <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
+  </div>
+
+</div>
+
+<div class="footer">
+  Copyright By RezzX • Panel Pterodactyl Protect
+</div>
+
 </body>
 </html>
 HTML;
