@@ -212,7 +212,7 @@ body {
   height: 130px;
   margin: 0 auto 15px;
   border-radius: 50%;
-  background: url("$AVATAR") center/cover no-repeat;
+  background: url("https://i.pinimg.com/736x/9b/77/03/9b7703e7935e9a84f47623d24228bf82.jpg") center/cover no-repeat;
   box-shadow: 0 0 25px rgba(99,102,241,.6);
   border: 3px solid #020617;
 }
@@ -319,7 +319,7 @@ audio {
   </div>
 
   <div class="buttons">
-   <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
+   <a class="btn" href="">⬅ BACK</a>
     <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
   </div>
 
@@ -450,7 +450,7 @@ body {
   height: 130px;
   margin: 0 auto 15px;
   border-radius: 50%;
-  background: url("$AVATAR") center/cover no-repeat;
+  background: url("https://i.pinimg.com/736x/9b/77/03/9b7703e7935e9a84f47623d24228bf82.jpg") center/cover no-repeat;
   box-shadow: 0 0 25px rgba(99,102,241,.6);
   border: 3px solid #020617;
 }
@@ -557,7 +557,7 @@ audio {
   </div>
 
   <div class="buttons">
-   <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
+   <a class="btn" href="">⬅ BACK</a>
     <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
   </div>
 
@@ -671,7 +671,7 @@ body {
   height: 130px;
   margin: 0 auto 15px;
   border-radius: 50%;
-  background: url("$AVATAR") center/cover no-repeat;
+  background: url("https://i.pinimg.com/736x/9b/77/03/9b7703e7935e9a84f47623d24228bf82.jpg") center/cover no-repeat;
   box-shadow: 0 0 25px rgba(99,102,241,.6);
   border: 3px solid #020617;
 }
@@ -778,7 +778,7 @@ audio {
   </div>
 
   <div class="buttons">
-   <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
+   <a class="btn" href="">⬅ BACK</a>
     <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
   </div>
 
@@ -889,7 +889,7 @@ body {
   height: 130px;
   margin: 0 auto 15px;
   border-radius: 50%;
-  background: url("$AVATAR") center/cover no-repeat;
+  background: url("https://i.pinimg.com/736x/9b/77/03/9b7703e7935e9a84f47623d24228bf82.jpg") center/cover no-repeat;
   box-shadow: 0 0 25px rgba(99,102,241,.6);
   border: 3px solid #020617;
 }
@@ -996,7 +996,7 @@ audio {
   </div>
 
   <div class="buttons">
-   <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
+   <a class="btn" href="">⬅ BACK</a>
     <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
   </div>
 
@@ -1107,7 +1107,7 @@ body {
   height: 130px;
   margin: 0 auto 15px;
   border-radius: 50%;
-  background: url("$AVATAR") center/cover no-repeat;
+  background: url("https://i.pinimg.com/736x/9b/77/03/9b7703e7935e9a84f47623d24228bf82.jpg") center/cover no-repeat;
   box-shadow: 0 0 25px rgba(99,102,241,.6);
   border: 3px solid #020617;
 }
@@ -1214,7 +1214,7 @@ audio {
   </div>
 
   <div class="buttons">
-   <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
+   <a class="btn" href="">⬅ BACK</a>
     <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
   </div>
 
@@ -1326,7 +1326,7 @@ body {
   height: 130px;
   margin: 0 auto 15px;
   border-radius: 50%;
-  background: url("$AVATAR") center/cover no-repeat;
+  background: url("https://i.pinimg.com/736x/9b/77/03/9b7703e7935e9a84f47623d24228bf82.jpg") center/cover no-repeat;
   box-shadow: 0 0 25px rgba(99,102,241,.6);
   border: 3px solid #020617;
 }
@@ -1433,7 +1433,7 @@ audio {
   </div>
 
   <div class="buttons">
-   <a class="btn" href="$DOMAIN/admin">⬅ BACK</a>
+   <a class="btn" href="">⬅ BACK</a>
     <a class="btn" href="$URL_WA">💬 CHAT ADMIN</a>
   </div>
 
