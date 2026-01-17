@@ -1,10 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
-# ==============================
-# Protect Panel Pterodactyl
-# By RezzX (FINAL FIX)
-# ==============================
+# ==========================================
+# Protect Panel Pterodactyl - Node Hard Lock
+# By RezzX (REAL FINAL, NO 500)
+# ==========================================
 
 DOMAIN="${1:-}"
 CHAT_ADMIN="${2:-}"
@@ -12,18 +12,17 @@ JSONBIN_URL="${3:-}"
 
 BASE="/var/www/pterodactyl"
 MW="$BASE/app/Http/Middleware/ProtectNodes.php"
-VIEW="$BASE/resources/views/errors/protect-nodes.blade.php"
+VIEW="$BASE/resources/views/errors/403.blade.php"
 KERNEL="$BASE/app/Http/Kernel.php"
-ROUTES="$BASE/routes/admin.php"
 
 [ -z "$DOMAIN" ] && echo "❌ DOMAIN wajib" && exit 1
 
-echo "🔐 Installing Node Protection..."
+echo "🔐 Installing NODE Protection (SAFE MODE)..."
 
-# ===============================
-# Middleware
-# ===============================
-cat > "$MW" <<EOF
+# =====================================================
+# Middleware (PASTI 403, BUKAN 500)
+# =====================================================
+cat > "$MW" <<'PHP'
 <?php
 
 namespace Pterodactyl\Http\Middleware;
@@ -34,33 +33,37 @@ use Illuminate\Support\Facades\Http;
 
 class ProtectNodes
 {
-    public function handle(\$request, Closure \$next)
+    public function handle($request, Closure $next)
     {
-        \$user = Auth::user();
-        \$allowed = [1];
+        if (!str_starts_with($request->path(), 'admin/nodes')) {
+            return $next($request);
+        }
 
-        \$jsonbin = "${JSONBIN_URL}";
-        if (!empty(\$jsonbin)) {
+        $user = Auth::user();
+        $allowed = [1];
+
+        $jsonbin = getenv('PTERO_NODE_PROTECT_JSONBIN');
+        if ($jsonbin) {
             try {
-                \$res = Http::timeout(3)->get(\$jsonbin);
-                if (\$res->ok() && isset(\$res['allowed_ids'])) {
-                    \$allowed = \$res['allowed_ids'];
+                $res = Http::timeout(3)->get($jsonbin);
+                if ($res->ok() && isset($res['allowed_ids'])) {
+                    $allowed = $res['allowed_ids'];
                 }
-            } catch (\Throwable \$e) {}
+            } catch (\Throwable $e) {}
         }
 
-        if (!\$user || !in_array((int)\$user->id, \$allowed)) {
-            return response()->view('errors.protect-nodes', [], 403);
+        if (!$user || !in_array((int)$user->id, $allowed)) {
+            abort(403); // ⬅️ PENTING
         }
 
-        return \$next(\$request);
+        return $next($request);
     }
 }
-EOF
+PHP
 
-# ===============================
-# HTML VIEW
-# ===============================
+# =====================================================
+# HTML ERROR 403 (PAKAI HTML KAMU, TIDAK DIUBAH)
+# =====================================================
 mkdir -p "$(dirname "$VIEW")"
 
 cat > "$VIEW" <<EOF
@@ -68,61 +71,75 @@ cat > "$VIEW" <<EOF
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>403 | Node Locked</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>403 | Protect Panel RezzX</title>
 <style>
+$(sed 's/\$/\\$/g' <<'CSS'
+:root {
+  --bg:#0b1220;--text:#cbd5e1;--muted:#64748b;--accent:#38bdf8;--danger:#ef4444;
+}
+*{box-sizing:border-box;font-family:"Segoe UI",sans-serif}
 body{
-background:#0b1220;
-color:#cbd5e1;
-font-family:sans-serif;
-display:flex;
-align-items:center;
-justify-content:center;
-height:100vh
+margin:0;background:radial-gradient(circle at top,#0f172a,var(--bg));
+min-height:100vh;display:flex;justify-content:center;align-items:center;color:var(--text)
 }
+.wrapper{text-align:center;width:100%;padding:20px}
+.avatar{
+width:130px;height:130px;margin:0 auto 15px;border-radius:50%;
+background:url("https://i.pinimg.com/736x/9b/77/03/9b7703e7935e9a84f47623d24228bf82.jpg") center/cover no-repeat;
+box-shadow:0 0 25px rgba(99,102,241,.6);border:3px solid #020617
+}
+.buttons{display:flex;justify-content:center;gap:15px;margin-top:15px}
 .btn{
-padding:12px 20px;
-border-radius:10px;
-background:#6366f1;
-color:white;
-text-decoration:none;
-font-weight:bold
+position:relative;padding:12px 22px;font-weight:bold;border-radius:12px;
+text-decoration:none;color:#fff;
+background:linear-gradient(135deg,#0ea5e9,#6366f1);
+box-shadow:0 0 18px rgba(56,189,248,.6)
 }
+.footer{position:fixed;bottom:15px;width:100%;text-align:center;font-size:11px;color:var(--muted)}
+CSS
+)
 </style>
 </head>
 <body>
-<div style="text-align:center">
-<h2>🚫 NODE AREA LOCKED</h2>
-<p>Akses dibatasi untuk admin tertentu.</p>
-<a class="btn" href="${DOMAIN}/admin">⬅ BACK</a>
-EOF
 
-if [ -n "$CHAT_ADMIN" ]; then
-  echo "<br><br><a class=\"btn\" href=\"$CHAT_ADMIN\">💬 CHAT ADMIN</a>" >> "$VIEW"
-fi
+<div class="wrapper">
+  <h1><span style="color:#ef4444">🚫</span> 403 | NODE DIPROTECT</h1>
+  <div class="avatar"></div>
+  <p>Node ini hanya bisa diakses admin tertentu.</p>
 
-cat >> "$VIEW" <<EOF
+  <div class="buttons">
+    <a class="btn" href="${DOMAIN}/admin">⬅ BACK</a>
+    <a class="btn" href="${CHAT_ADMIN}">💬 CHAT ADMIN</a>
+  </div>
 </div>
+
+<div class="footer">
+Copyright By RezzX • Panel Pterodactyl Protect
+</div>
+
 </body>
 </html>
 EOF
 
-# ===============================
-# Register Middleware
-# ===============================
-grep -q protect.nodes "$KERNEL" || \
-sed -i "/routeMiddleware/a\        'protect.nodes' => \\\\Pterodactyl\\\\Http\\\\Middleware\\\\ProtectNodes::class," "$KERNEL"
+# =====================================================
+# Register Middleware (AMAN)
+# =====================================================
+grep -q ProtectNodes "$KERNEL" || \
+sed -i "/protected \$middlewareGroups = \[/a\        'protect.nodes' => \\\\Pterodactyl\\\\Http\\\\Middleware\\\\ProtectNodes::class," "$KERNEL"
 
-sed -i "s/prefix' => 'nodes'/prefix' => 'nodes', 'middleware' => ['protect.nodes']/" "$ROUTES"
+# =====================================================
+# ENV JSONBIN (AMAN)
+# =====================================================
+grep -q PTERO_NODE_PROTECT_JSONBIN "$BASE/.env" || \
+echo "PTERO_NODE_PROTECT_JSONBIN=${JSONBIN_URL}" >> "$BASE/.env"
 
-# ===============================
-# Laravel Clear Cache (FIX UTAMA)
-# ===============================
+# =====================================================
+# Clear Cache (WAJIB)
+# =====================================================
 cd "$BASE"
-
-php artisan view:clear
-php artisan route:clear
-php artisan config:clear
+php artisan optimize:clear
 
 chown -R www-data:www-data "$BASE"
 
-echo "✅ NODE PROTECTION ACTIVE"
+echo "✅ NODE PROTECT ACTIVE (403 ONLY, NO 500)"
