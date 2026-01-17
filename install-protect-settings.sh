@@ -2,7 +2,7 @@
 set -e
 
 PANEL="/var/www/pterodactyl"
-SETTINGS_DIR="$PANEL/app/Http/Controllers/Admin/Settings"
+SETTINGS="$PANEL/app/Http/Controllers/Admin/Settings"
 ERROR_VIEW="$PANEL/resources/views/errors/403.blade.php"
 TS=$(date +"%Y%m%d_%H%M%S")
 
@@ -19,7 +19,7 @@ fi
 
 echo "🚀 INSTALL PROTECT SETTINGS (OWNER ONLY)"
 
-# ================= 403 VIEW =================
+# ================= CUSTOM 403 VIEW =================
 mkdir -p "$(dirname "$ERROR_VIEW")"
 cat > "$ERROR_VIEW" << HTML
 <!DOCTYPE html>
@@ -62,47 +62,33 @@ color:#fff;text-decoration:none
 </html>
 HTML
 
-# ================= PATCH INDEX =================
-INDEX="$SETTINGS_DIR/IndexController.php"
-cp "$INDEX" "$INDEX.bak_$TS"
+# ================= FUNCTION PATCH =================
+patch_controller () {
+  FILE="$1"
 
-sed -i "/function index/a\\
-        \\$user = \\Illuminate\\\\Support\\\\Facades\\\\Auth::user();\\
+  if [ ! -f "$FILE" ]; then
+    echo "⚠️ SKIP (tidak ada): $FILE"
+    return
+  fi
+
+  cp "$FILE" "$FILE.bak_$TS"
+  echo "🔒 PATCHING: $FILE"
+
+  sed -i "/function index/a\\
+        \\$user = \\\\Illuminate\\\\Support\\\\Facades\\\\Auth::user();\\
         if (!\\$user || \\$user->id !== 1) { abort(403); }\\
-" "$INDEX"
+" "$FILE"
 
-sed -i "/function update/a\\
-        \\$user = \\Illuminate\\\\Support\\\\Facades\\\\Auth::user();\\
+  sed -i "/function update/a\\
+        \\$user = \\\\Illuminate\\\\Support\\\\Facades\\\\Auth::user();\\
         if (!\\$user || \\$user->id !== 1) { abort(403); }\\
-" "$INDEX"
+" "$FILE"
+}
 
-# ================= PATCH MAIL =================
-MAIL="$SETTINGS_DIR/MailController.php"
-cp "$MAIL" "$MAIL.bak_$TS"
-
-sed -i "/function index/a\\
-        \\$user = \\Illuminate\\\\Support\\\\Facades\\\\Auth::user();\\
-        if (!\\$user || \\$user->id !== 1) { abort(403); }\\
-" "$MAIL"
-
-sed -i "/function update/a\\
-        \\$user = \\Illuminate\\\\Support\\\\Facades\\\\Auth::user();\\
-        if (!\\$user || \\$user->id !== 1) { abort(403); }\\
-" "$MAIL"
-
-# ================= PATCH ADVANCED =================
-ADV="$SETTINGS_DIR/AdvancedController.php"
-cp "$ADV" "$ADV.bak_$TS"
-
-sed -i "/function index/a\\
-        \\$user = \\Illuminate\\\\Support\\\\Facades\\\\Auth::user();\\
-        if (!\\$user || \\$user->id !== 1) { abort(403); }\\
-" "$ADV"
-
-sed -i "/function update/a\\
-        \\$user = \\Illuminate\\\\Support\\\\Facades\\\\Auth::user();\\
-        if (!\\$user || \\$user->id !== 1) { abort(403); }\\
-" "$ADV"
+# ================= PATCH REAL FILES =================
+patch_controller "$SETTINGS/IndexController.php"
+patch_controller "$SETTINGS/AdvancedController.php"
+patch_controller "$SETTINGS/Mail/MailController.php"
 
 # ================= CLEAR CACHE =================
 cd "$PANEL"
@@ -112,4 +98,4 @@ echo "✅ PROTECT SETTINGS AKTIF"
 echo "🔒 /admin/settings"
 echo "🔒 /admin/settings/mail"
 echo "🔒 /admin/settings/advanced"
-echo "👑 ONLY USER ID 1"
+echo "👑 HANYA USER ID 1"
