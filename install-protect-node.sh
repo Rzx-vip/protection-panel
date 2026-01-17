@@ -1,98 +1,107 @@
 #!/bin/bash
 
-# ================= CONFIG =================
-PANEL="/var/www/pterodactyl"
-ERROR_VIEW="$PANEL/resources/views/errors/403.blade.php"
-SETTINGS_CTRL="$PANEL/app/Http/Controllers/Admin/Settings/IndexController.php"
+REMOTE_PATH="/var/www/pterodactyl/app/Http/Controllers/Admin/Nodes/NodeController.php"
+ERROR_VIEW="/var/www/pterodactyl/resources/views/errors/403.blade.php"
 TIMESTAMP=$(date -u +"%Y-%m-%d-%H-%M-%S")
+BACKUP_PATH="${REMOTE_PATH}.bak_${TIMESTAMP}"
 
-DOMAIN="$1"
-WA="$2"
-AVATAR="$3"
+echo "🚀 Memasang proteksi Nodes + View 403..."
 
-[ -z "$AVATAR" ] && AVATAR="https://files.catbox.moe/1s2o5m.jpg"
-URL_WA="https://wa.me/$WA"
-
-echo "🚀 Memasang Protect Settings Panel..."
-
-# ================= VALIDASI =================
-if [ -z "$DOMAIN" ] || [ -z "$WA" ]; then
-  echo "❌ CONTOH:"
-  echo "bash install.sh https://panel.domain.com 628xxxx"
-  exit 1
+# ================= BACKUP CONTROLLER =================
+if [ -f "$REMOTE_PATH" ]; then
+  mv "$REMOTE_PATH" "$BACKUP_PATH"
+  echo "📦 Backup controller dibuat"
 fi
+
+mkdir -p "$(dirname "$REMOTE_PATH")"
+chmod 755 "$(dirname "$REMOTE_PATH")"
 
 # ================= 403 VIEW =================
 mkdir -p "$(dirname "$ERROR_VIEW")"
 
-cat > "$ERROR_VIEW" <<EOF
+cat > "$ERROR_VIEW" <<'EOF'
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>403 | Protected</title>
+<title>403 | Access Denied</title>
 <style>
-body{margin:0;background:#0b1220;color:#cbd5e1;
-display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif}
-.card{text-align:center}
-.avatar{width:120px;height:120px;border-radius:50%;
-background:url("$AVATAR") center/cover no-repeat;margin:15px auto}
-a{display:inline-block;margin:6px;padding:10px 18px;
-background:#4f46e5;color:#fff;text-decoration:none;border-radius:10px}
+body{
+  margin:0;
+  background:#0b1220;
+  color:#cbd5e1;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:sans-serif;
+}
+.box{text-align:center}
+a{
+  display:inline-block;
+  margin-top:15px;
+  padding:10px 18px;
+  background:#4f46e5;
+  color:#fff;
+  text-decoration:none;
+  border-radius:10px;
+}
 </style>
 </head>
 <body>
-<div class="card">
+<div class="box">
 <h2>🚫 ACCESS DENIED</h2>
-<div class="avatar"></div>
-<p>Settings panel dilindungi.<br>Hanya OWNER.</p>
-<a href="$DOMAIN/admin">⬅ Back</a>
-<a href="$URL_WA">💬 Chat Admin</a>
+<p>Menu Nodes dilindungi.<br>Hanya OWNER.</p>
+<a href="/admin">⬅ Back</a>
 </div>
 </body>
 </html>
 EOF
 
-echo "✅ View 403 dipasang"
-
-# ================= BACKUP =================
-if [ -f "$SETTINGS_CTRL" ]; then
-  mv "$SETTINGS_CTRL" "$SETTINGS_CTRL.bak_$TIMESTAMP"
-  echo "📦 Backup dibuat"
-fi
-
-mkdir -p "$(dirname "$SETTINGS_CTRL")"
-
-# ================= CONTROLLER =================
-cat > "$SETTINGS_CTRL" << 'EOF'
+# ================= NODE CONTROLLER =================
+cat > "$REMOTE_PATH" <<'EOF'
 <?php
 
-namespace Pterodactyl\Http\Controllers\Admin\Settings;
+namespace Pterodactyl\Http\Controllers\Admin\Nodes;
 
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Pterodactyl\Models\Node;
+use Spatie\QueryBuilder\QueryBuilder;
 use Pterodactyl\Http\Controllers\Controller;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 
-class IndexController extends Controller
+class NodeController extends Controller
 {
+    public function __construct(private ViewFactory $view)
+    {
+    }
+
     public function index(Request $request): View
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            abort(403);
+            return response()->view('errors.403', [], 403);
         }
 
-        return view('admin.settings.index');
+        $nodes = QueryBuilder::for(
+            Node::query()->with('location')->withCount('servers')
+        )
+        ->allowedFilters(['uuid', 'name'])
+        ->allowedSorts(['id'])
+        ->paginate(25);
+
+        return $this->view->make('admin.nodes.index', ['nodes' => $nodes]);
     }
 }
 EOF
 
-chmod 644 "$SETTINGS_CTRL"
+chmod 644 "$REMOTE_PATH"
 
 # ================= CLEAR CACHE =================
-cd "$PANEL"
+cd /var/www/pterodactyl || exit
 php artisan optimize:clear
 
-echo "✅ Protect Settings AKTIF"
+echo "✅ Proteksi Nodes + View HTML AKTIF"
 echo "🔒 Hanya User ID 1"
