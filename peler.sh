@@ -3,7 +3,7 @@ set -euo pipefail
 
 # ==============================
 # Protect Panel Pterodactyl
-# By RezzX (FIXED)
+# By RezzX (FINAL FIX)
 # ==============================
 
 DOMAIN="${1:-}"
@@ -70,10 +70,23 @@ cat > "$VIEW" <<EOF
 <meta charset="UTF-8">
 <title>403 | Node Locked</title>
 <style>
-body{background:#0b1220;color:#cbd5e1;font-family:sans-serif;
-display:flex;align-items:center;justify-content:center;height:100vh}
-.btn{padding:12px 20px;border-radius:10px;
-background:#6366f1;color:white;text-decoration:none;font-weight:bold}
+body{
+background:#0b1220;
+color:#cbd5e1;
+font-family:sans-serif;
+display:flex;
+align-items:center;
+justify-content:center;
+height:100vh
+}
+.btn{
+padding:12px 20px;
+border-radius:10px;
+background:#6366f1;
+color:white;
+text-decoration:none;
+font-weight:bold
+}
 </style>
 </head>
 <body>
@@ -96,12 +109,20 @@ EOF
 # ===============================
 # Register Middleware
 # ===============================
-grep -q protect.nodes "$KERNEL" || sed -i "/routeMiddleware/a\        'protect.nodes' => \\\\Pterodactyl\\\\Http\\\\Middleware\\\\ProtectNodes::class," "$KERNEL"
+grep -q protect.nodes "$KERNEL" || \
+sed -i "/routeMiddleware/a\        'protect.nodes' => \\\\Pterodactyl\\\\Http\\\\Middleware\\\\ProtectNodes::class," "$KERNEL"
 
 sed -i "s/prefix' => 'nodes'/prefix' => 'nodes', 'middleware' => ['protect.nodes']/" "$ROUTES"
 
-chown -R www-data:www-data "$BASE"
+# ===============================
+# Laravel Clear Cache (FIX UTAMA)
+# ===============================
+cd "$BASE"
+
 php artisan view:clear
 php artisan route:clear
+php artisan config:clear
+
+chown -R www-data:www-data "$BASE"
 
 echo "✅ NODE PROTECTION ACTIVE"
