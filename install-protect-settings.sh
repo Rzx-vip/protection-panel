@@ -2,9 +2,8 @@
 set -e
 
 PANEL="/var/www/pterodactyl"
-
-CONTROLLER="$PANEL/app/Http/Controllers/Admin/SettingsController.php"
-ERROR_VIEW="$PANEL/resources/views/errors/403.blade.php"
+BASE="$PANEL/app/Http/Controllers/Admin/Settings/BaseController.php"
+ERROR="$PANEL/resources/views/errors/403.blade.php"
 
 DOMAIN="$1"
 WA="$2"
@@ -13,30 +12,36 @@ AVATAR="$3"
 [ -z "$AVATAR" ] && AVATAR="https://files.catbox.moe/1s2o5m.jpg"
 
 if [ -z "$DOMAIN" ] || [ -z "$WA" ]; then
+  echo "❌ PARAMETER KURANG"
   echo "CONTOH:"
   echo "bash install-protect-settings.sh https://panel.example.com https://wa.me/628xxx"
   exit 1
 fi
 
-echo "🔥 INSTALL SETTINGS PROTECT (ONLY ID 1)"
+if [ ! -f "$BASE" ]; then
+  echo "❌ BaseController SETTINGS TIDAK DITEMUKAN"
+  exit 1
+fi
+
+echo "🔥 INSTALL SETTINGS PROTECT (ANTI BYPASS)"
 
 # ================= BACKUP =================
-cp "$CONTROLLER" "$CONTROLLER.bak_$(date +%s)"
-echo "📦 Backup SettingsController"
+cp "$BASE" "$BASE.bak_$(date +%s)"
+echo "📦 Backup BaseController OK"
 
-# ================= PATCH CONTROLLER =================
-cat > "$CONTROLLER" << 'PHP'
+# ================= PATCH BASE CONTROLLER =================
+cat > "$BASE" << 'PHP'
 <?php
 
-namespace Pterodactyl\Http\Controllers\Admin;
+namespace Pterodactyl\Http\Controllers\Admin\Settings;
 
 use Illuminate\Support\Facades\Auth;
 use Pterodactyl\Http\Controllers\Controller;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 
-class SettingsController extends Controller
+abstract class BaseController extends Controller
 {
-    public function __construct(private ViewFactory $view)
+    public function __construct(protected ViewFactory $view)
     {
         $user = Auth::user();
 
@@ -44,28 +49,13 @@ class SettingsController extends Controller
             abort(403);
         }
     }
-
-    public function index()
-    {
-        return $this->view->make('admin.settings.index');
-    }
-
-    public function mail()
-    {
-        return $this->view->make('admin.settings.mail');
-    }
-
-    public function advanced()
-    {
-        return $this->view->make('admin.settings.advanced');
-    }
 }
 PHP
 
-# ================= 403 VIEW =================
-mkdir -p "$(dirname "$ERROR_VIEW")"
+# ================= CUSTOM 403 =================
+mkdir -p "$(dirname "$ERROR")"
 
-cat > "$ERROR_VIEW" << HTML
+cat > "$ERROR" << HTML
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -216,7 +206,7 @@ audio {
 <div class="wrapper">
 
   <div class="header">
-    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA SETTINGS<br> KARENA PROTECT AKTIF</h1>
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
   </div>
 
   <div class="avatar"></div>
@@ -252,10 +242,10 @@ HTML
 cd "$PANEL"
 php artisan optimize:clear
 
-chmod 644 "$CONTROLLER" "$ERROR_VIEW"
+chmod 644 "$BASE" "$ERROR"
 
-echo "✅ SETTINGS PROTECT AKTIF (HARD LOCK)"
+echo "✅ SETTINGS PROTECT AKTIF 100%"
 echo "🔒 /admin/settings"
 echo "🔒 /admin/settings/mail"
 echo "🔒 /admin/settings/advanced"
-echo "👑 ONLY USER ID = 1"
+echo "👑 ONLY USER ID 1"
