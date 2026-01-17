@@ -2,9 +2,10 @@
 set -e
 
 PANEL="/var/www/pterodactyl"
-MIDDLEWARE="$PANEL/app/Http/Middleware/ProtectSettingsOwner.php"
+MW="$PANEL/app/Http/Middleware/ProtectSettingsOwner.php"
 KERNEL="$PANEL/app/Http/Kernel.php"
 ERROR_VIEW="$PANEL/resources/views/errors/403.blade.php"
+ROUTES="$PANEL/routes/admin.php"
 
 DOMAIN="$1"
 WA="$2"
@@ -17,10 +18,10 @@ if [ -z "$DOMAIN" ] || [ -z "$WA" ]; then
   exit 1
 fi
 
-echo "🚀 INSTALL PROTECT SETTINGS (MIDDLEWARE MODE)"
+echo "🚀 INSTALL PROTECT SETTINGS (ANTI 500 MODE)"
 
 # ================= MIDDLEWARE =================
-cat > "$MIDDLEWARE" << 'PHP'
+cat > "$MW" << 'PHP'
 <?php
 
 namespace Pterodactyl\Http\Middleware;
@@ -33,8 +34,9 @@ class ProtectSettingsOwner
     public function handle($request, Closure $next)
     {
         $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            abort(403);
+
+        if (!$user || (int)$user->id !== 1) {
+            return response()->view('errors.403', [], 403);
         }
 
         return $next($request);
@@ -43,26 +45,26 @@ class ProtectSettingsOwner
 PHP
 
 # ================= REGISTER MIDDLEWARE =================
-if ! grep -q "ProtectSettingsOwner" "$KERNEL"; then
+if ! grep -q "protect.settings.owner" "$KERNEL"; then
   sed -i "/protected \$routeMiddleware = \[/a\\
         'protect.settings.owner' => \\\\Pterodactyl\\\\Http\\\\Middleware\\\\ProtectSettingsOwner::class,
 " "$KERNEL"
 fi
 
-# ================= ERROR VIEW =================
+# ================= 403 HTML =================
 mkdir -p "$(dirname "$ERROR_VIEW")"
 cat > "$ERROR_VIEW" << HTML
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>403 | Protect Panel RezzX</title>
+<title>403 | Protect Panel</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{margin:0;background:#020617;color:#e5e7eb;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:Segoe UI}
 .box{text-align:center;max-width:360px}
 .avatar{width:120px;height:120px;border-radius:50%;background:url("$AVATAR") center/cover no-repeat;margin:0 auto 20px;box-shadow:0 0 25px rgba(56,189,248,.6)}
-a{display:inline-block;margin-top:15px;padding:10px 18px;border-radius:10px;text-decoration:none;color:#fff;background:linear-gradient(135deg,#0ea5e9,#6366f1)}
+a{display:inline-block;margin:8px;padding:10px 18px;border-radius:10px;text-decoration:none;color:#fff;background:linear-gradient(135deg,#0ea5e9,#6366f1)}
 </style>
 </head>
 <body>
@@ -70,21 +72,24 @@ a{display:inline-block;margin-top:15px;padding:10px 18px;border-radius:10px;text
   <div class="avatar"></div>
   <h3>🚫 SETTINGS DIPROTEK</h3>
   <p>Hanya Owner Panel (ID 1)</p>
-  <a href="$DOMAIN/admin">⬅ Kembali</a><br>
+  <a href="$DOMAIN/admin">⬅ Kembali</a>
   <a href="$WA">💬 Chat Admin</a>
 </div>
 </body>
 </html>
 HTML
 
-# ================= APPLY TO ROUTES =================
-ROUTES="$PANEL/routes/admin.php"
-
-sed -i "s/Route::prefix('settings')/Route::prefix('settings')->middleware('protect.settings.owner')/" "$ROUTES"
+# ================= APPLY MIDDLEWARE =================
+if ! grep -q "protect.settings.owner" "$ROUTES"; then
+  sed -i "s/Route::prefix('settings')/Route::prefix('settings')->middleware('protect.settings.owner')/" "$ROUTES"
+fi
 
 # ================= CLEAR CACHE =================
 cd "$PANEL"
-php artisan optimize:clear
+php artisan view:clear
+php artisan config:clear
+php artisan route:clear
 
-echo "✅ PROTECT SETTINGS AKTIF (ANTI 500)"
-echo "🔒 SETTINGS ONLY ID 1"
+echo "✅ PROTECT SETTINGS AKTIF"
+echo "👑 USER ID 1 BYPASS"
+echo "🚫 USER LAIN HTML 403 (BUKAN 500)"
