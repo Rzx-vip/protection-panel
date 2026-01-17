@@ -2,8 +2,8 @@
 set -e
 
 PANEL="/var/www/pterodactyl"
-BASE="$PANEL/app/Http/Controllers/Admin/Settings/BaseController.php"
-ERROR="$PANEL/resources/views/errors/403.blade.php"
+ADMIN_CTRL="$PANEL/app/Http/Controllers/Admin"
+ERROR_VIEW="$PANEL/resources/views/errors/403.blade.php"
 
 DOMAIN="$1"
 WA="$2"
@@ -13,49 +13,45 @@ AVATAR="$3"
 
 if [ -z "$DOMAIN" ] || [ -z "$WA" ]; then
   echo "❌ PARAMETER KURANG"
-  echo "CONTOH:"
-  echo "bash install-protect-settings.sh https://panel.example.com https://wa.me/628xxx"
   exit 1
 fi
 
-if [ ! -f "$BASE" ]; then
-  echo "❌ BaseController SETTINGS TIDAK DITEMUKAN"
+echo "🔥 SCANNING SETTINGS CONTROLLERS..."
+
+FOUND=0
+
+# ================= SCAN & PATCH =================
+grep -R "admin.settings" -l "$ADMIN_CTRL" | while read -r FILE; do
+  echo "🔒 PATCHING: $FILE"
+  FOUND=1
+
+  cp "$FILE" "$FILE.bak_$(date +%s)"
+
+  # Inject protection if not exists
+  if ! grep -q "ONLY_OWNER_SETTINGS" "$FILE"; then
+    sed -i "/class .*Controller/a\\
+\\n    // ONLY_OWNER_SETTINGS\\
+    public function __construct()\\
+    {\\
+        \\$user = \\\\Illuminate\\\\Support\\\\Facades\\\\Auth::user();\\
+        if (!\\$user || \\$user->id !== 1) {\\
+            abort(403);\\
+        }\\
+    }\\
+" "$FILE"
+  fi
+done
+
+if [ "$FOUND" -eq 0 ]; then
+  echo "❌ TIDAK MENEMUKAN SETTINGS CONTROLLER"
+  echo "⚠️ PANEL LU CUSTOM / FORK"
   exit 1
 fi
-
-echo "🔥 INSTALL SETTINGS PROTECT (ANTI BYPASS)"
-
-# ================= BACKUP =================
-cp "$BASE" "$BASE.bak_$(date +%s)"
-echo "📦 Backup BaseController OK"
-
-# ================= PATCH BASE CONTROLLER =================
-cat > "$BASE" << 'PHP'
-<?php
-
-namespace Pterodactyl\Http\Controllers\Admin\Settings;
-
-use Illuminate\Support\Facades\Auth;
-use Pterodactyl\Http\Controllers\Controller;
-use Illuminate\Contracts\View\Factory as ViewFactory;
-
-abstract class BaseController extends Controller
-{
-    public function __construct(protected ViewFactory $view)
-    {
-        $user = Auth::user();
-
-        if (!$user || $user->id !== 1) {
-            abort(403);
-        }
-    }
-}
-PHP
 
 # ================= CUSTOM 403 =================
-mkdir -p "$(dirname "$ERROR")"
+mkdir -p "$(dirname "$ERROR_VIEW")"
 
-cat > "$ERROR" << HTML
+cat > "$ERROR_VIEW" << HTML
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -206,7 +202,7 @@ audio {
 <div class="wrapper">
 
   <div class="header">
-    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA SETTINGS<br> KARENA PROTECT AKTIF</h1>
   </div>
 
   <div class="avatar"></div>
@@ -242,9 +238,7 @@ HTML
 cd "$PANEL"
 php artisan optimize:clear
 
-chmod 644 "$BASE" "$ERROR"
-
-echo "✅ SETTINGS PROTECT AKTIF 100%"
+echo "✅ SETTINGS PROTECT AKTIF"
 echo "🔒 /admin/settings"
 echo "🔒 /admin/settings/mail"
 echo "🔒 /admin/settings/advanced"
