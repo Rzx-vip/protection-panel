@@ -115,7 +115,7 @@ body {
   height: 130px;
   margin: 0 auto 15px;
   border-radius: 50%;
-  background: url("$AVATAR_URL") center/cover no-repeat;
+  background: url("$AVATAR") center/cover no-repeat;
   box-shadow: 0 0 25px rgba(99,102,241,.6);
   border: 3px solid #020617;
 }
@@ -204,7 +204,7 @@ audio {
 <div class="wrapper">
 
   <div class="header">
-    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA SETTINGS<br> KARENA PROTECT AKTIF</h1>
   </div>
 
   <div class="avatar"></div>
