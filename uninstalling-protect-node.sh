@@ -7,7 +7,7 @@ PROTECT_VIEW="$VIEW_DIR/protect-node.blade.php"
 
 echo "🧨 FORCE UNINSTALL PROTECT NODE"
 
-# ================= FORCE RESTORE CONTROLLER =================
+# ================= FORCE RESTORE CONTROLLER ==================
 echo "🔁 Restoring ORIGINAL NodeController..."
 
 cat > "$CONTROLLER" << 'PHP'
