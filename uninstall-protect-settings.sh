@@ -27,4 +27,4 @@ rm -f "$PANEL/resources/views/errors/403.blade.php"
 cd "$PANEL"
 php artisan optimize:clear
 
-echo "✅ DONE — JIKA BACKUP ADA, SETTINGS SUDAH NORMAL"
+echo "✅ DONE — JIKA BACKUP ADA, SETTINGS SUDAH NORMALS"
