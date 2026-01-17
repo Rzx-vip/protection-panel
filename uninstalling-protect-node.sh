@@ -1,41 +1,71 @@
 #!/bin/bash
+set -e
 
-PANEL_PATH="/var/www/pterodactyl"
-CONTROLLER="$PANEL_PATH/app/Http/Controllers/Admin/Nodes/NodeController.php"
-ERROR_VIEW="$PANEL_PATH/resources/views/errors/403.blade.php"
+PANEL="/var/www/pterodactyl"
+CONTROLLER="$PANEL/app/Http/Controllers/Admin/Nodes/NodeController.php"
+VIEW_DIR="$PANEL/resources/views/errors"
+PROTECT_VIEW="$VIEW_DIR/protect-node.blade.php"
 
-echo "🧹 Uninstalling PROTECT NODE..."
+echo "🧨 FORCE UNINSTALL PROTECT NODE (REAL FIX)"
 
 # ================= RESTORE CONTROLLER =================
-BACKUP_FILE=$(ls -t ${CONTROLLER}.bak_* 2>/dev/null | head -n 1)
+echo "🔁 Restoring default NodeController..."
 
-if [ -z "$BACKUP_FILE" ]; then
-  echo "❌ Backup NodeController tidak ditemukan!"
-  echo "⚠️ Tidak bisa restore controller otomatis"
-else
-  mv "$BACKUP_FILE" "$CONTROLLER"
-  echo "✅ NodeController berhasil direstore"
-fi
+cat > "$CONTROLLER" << 'PHP'
+<?php
 
-# ================= REMOVE CUSTOM 403 VIEW =================
-if [ -f "$ERROR_VIEW" ]; then
-  rm -f "$ERROR_VIEW"
-  echo "🗑️ Custom 403 view dihapus"
+namespace Pterodactyl\Http\Controllers\Admin\Nodes;
+
+use Illuminate\View\View;
+use Illuminate\Http\Request;
+use Pterodactyl\Models\Node;
+use Spatie\QueryBuilder\QueryBuilder;
+use Pterodactyl\Http\Controllers\Controller;
+use Illuminate\Contracts\View\Factory as ViewFactory;
+
+class NodeController extends Controller
+{
+    public function __construct(private ViewFactory $view) {}
+
+    public function index(Request $request): View
+    {
+        $nodes = QueryBuilder::for(
+            Node::query()->with('location')->withCount('servers')
+        )
+            ->allowedFilters(['uuid', 'name'])
+            ->allowedSorts(['id'])
+            ->paginate(25);
+
+        return $this->view->make('admin.nodes.index', ['nodes' => $nodes]);
+    }
+}
+PHP
+
+chmod 644 "$CONTROLLER"
+echo "✅ NodeController NORMAL"
+
+# ================= REMOVE PROTECT VIEW =================
+if [ -f "$PROTECT_VIEW" ]; then
+    rm -f "$PROTECT_VIEW"
+    echo "🗑️ protect-node.blade.php removed"
 else
-  echo "ℹ️ Custom 403 view tidak ditemukan"
+    echo "ℹ️ protect-node.blade.php not found (OK)"
 fi
 
 # ================= CLEAR CACHE =================
-cd "$PANEL_PATH" || exit
+cd "$PANEL"
 
 php artisan view:clear
 php artisan route:clear
 php artisan config:clear
+php artisan optimize:clear
 
-echo "✅ Cache Laravel dibersihkan"
+rm -rf storage/framework/views/*
 
-# ================= PERMISSION =================
-chmod 644 "$CONTROLLER"
+# ================= FIX PERMISSION =================
+chown -R www-data:www-data "$PANEL"
+chmod -R 755 "$PANEL/storage"
+chmod -R 755 "$PANEL/bootstrap/cache"
 
-echo "🎉 UNINSTALL PROTECT NODE SELESAI"
-echo "🔓 Akses Nodes kembali NORMAL"
+echo "🎉 UNINSTALL SUCCESS"
+echo "🔓 NODE TAB NORMAL • NO 403 • NO PROTECT"
