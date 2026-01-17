@@ -2,40 +2,48 @@
 set -e
 
 PANEL="/var/www/pterodactyl"
-TMP="/tmp/ptero-fix"
+TMP="/tmp/ptero-rescue"
 
-echo "🚑 EMERGENCY FIX PTERODACTYL CORE"
+echo "🚑 PTERODACTYL FULL CORE RESCUE (ANTI 500)"
 
+rm -rf "$TMP"
 mkdir -p "$TMP"
 cd "$TMP"
 
-echo "⬇️ Download core Pterodactyl routes & controllers..."
-curl -sSL https://github.com/pterodactyl/panel/archive/refs/heads/develop.zip -o panel.zip
+echo "⬇️ Download Pterodactyl PANEL (STABLE RELEASE)"
+curl -L https://github.com/pterodactyl/panel/archive/refs/tags/v1.11.7.zip -o panel.zip
+
 unzip -q panel.zip
 
-SRC="$TMP/panel-develop"
+SRC="$TMP/panel-1.11.7"
 
-echo "🔄 RESTORE routes/admin.php"
+echo "🔄 RESTORE ROUTES"
 cp "$SRC/routes/admin.php" "$PANEL/routes/admin.php"
+cp "$SRC/routes/web.php"   "$PANEL/routes/web.php"
 
-echo "🔄 RESTORE Settings Controllers"
-mkdir -p "$PANEL/app/Http/Controllers/Admin/Settings"
-cp -r "$SRC/app/Http/Controllers/Admin/Settings/"* \
-      "$PANEL/app/Http/Controllers/Admin/Settings/"
+echo "🔄 RESTORE ADMIN CONTROLLERS"
+rsync -a \
+  "$SRC/app/Http/Controllers/Admin/" \
+  "$PANEL/app/Http/Controllers/Admin/"
 
-echo "🔄 RESTORE Kernel.php"
+echo "🔄 RESTORE HTTP KERNEL"
 cp "$SRC/app/Http/Kernel.php" "$PANEL/app/Http/Kernel.php"
 
-echo "🧹 REMOVE CUSTOM MIDDLEWARE"
-rm -f "$PANEL/app/Http/Middleware/OwnerOnlySettings.php"
-
-echo "🧹 REMOVE CUSTOM ERROR PAGES"
+echo "🧹 REMOVE ALL CUSTOM PROTECT FILES"
+rm -f "$PANEL/app/Http/Middleware/"*Protect*
 rm -f "$PANEL/resources/views/errors/403.blade.php"
 rm -f "$PANEL/resources/views/errors/500.blade.php"
 
-echo "🧼 CLEAR CACHE"
+echo "🧼 CLEAR LARAVEL CACHE"
 cd "$PANEL"
 php artisan optimize:clear
+php artisan view:clear
+php artisan route:clear
+php artisan config:clear
 
-echo "✅ EMERGENCY FIX SELESAI"
-echo "🚀 PANEL HARUS SUDAH HIDUP"
+echo "🔐 FIX PERMISSION"
+chown -R www-data:www-data "$PANEL"
+chmod -R 755 "$PANEL/storage" "$PANEL/bootstrap/cache"
+
+echo "✅ RESCUE SELESAI"
+echo "🚀 PANEL HARUS HIDUP SEKARANG"
