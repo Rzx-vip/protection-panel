@@ -1,55 +1,26 @@
 #!/bin/bash
 set -e
 
-PANEL="/var/www/pterodactyl"
-SETTINGS="$PANEL/app/Http/Controllers/Admin/Settings"
+REMOTE="/var/www/pterodactyl/app/Http/Controllers/Admin/Settings/IndexController.php"
 
-echo "🔥 NUKING PROTECT SETTINGS (FULL RESET MODE)"
+echo "🔥 UNINSTALL PROTECT SETTINGS (SAFE RESTORE)"
 
-# ================= SAFETY =================
-if [ ! -d "$PANEL" ]; then
-  echo "❌ PANEL PATH TIDAK ADA"
-  exit 1
-fi
-
-cd "$PANEL"
-
-# ================= STEP 1: DELETE SETTINGS CONTROLLERS =================
-echo "🧹 Removing broken Settings controllers..."
-
-rm -rf "$SETTINGS"
-
-# ================= STEP 2: RESTORE FROM GIT =================
-if [ -d ".git" ]; then
-  echo "🔄 Git detected — restoring original files"
-  git checkout -- app/Http/Controllers/Admin/Settings
+if ls ${REMOTE}.bak_* 1> /dev/null 2>&1; then
+  LAST_BACKUP=$(ls -t ${REMOTE}.bak_* | head -n1)
+  cp "$LAST_BACKUP" "$REMOTE"
+  echo "♻ Restored from backup: $LAST_BACKUP"
 else
-  echo "❌ PANEL BUKAN GIT INSTALL"
-  echo "📦 Downloading official Settings controllers..."
+  echo "⚠ Backup tidak ditemukan, restore dari repo resmi"
 
-  mkdir -p "$SETTINGS"
-
-  curl -fsSL https://raw.githubusercontent.com/pterodactyl/panel/develop/app/Http/Controllers/Admin/Settings/IndexController.php \
-    -o "$SETTINGS/IndexController.php"
-
-  curl -fsSL https://raw.githubusercontent.com/pterodactyl/panel/develop/app/Http/Controllers/Admin/Settings/MailController.php \
-    -o "$SETTINGS/MailController.php"
-
-  curl -fsSL https://raw.githubusercontent.com/pterodactyl/panel/develop/app/Http/Controllers/Admin/Settings/AdvancedController.php \
-    -o "$SETTINGS/AdvancedController.php"
+  curl -fsSL \
+    https://raw.githubusercontent.com/pterodactyl/panel/develop/app/Http/Controllers/Admin/Settings/IndexController.php \
+    -o "$REMOTE"
 fi
 
-chmod -R 644 "$SETTINGS"
-
-# ================= STEP 3: REMOVE CUSTOM ERROR VIEW =================
-rm -f "$PANEL/resources/views/errors/403.blade.php"
-
-# ================= STEP 4: CLEAR ALL CACHES =================
 php artisan optimize:clear
 php artisan view:clear
 php artisan route:clear
 php artisan config:clear
 
-echo "✅ SETTINGS CONTROLLER RESET SELESAI"
-echo "🔓 /admin/settings SUDAH NORMAL"
-echo "❌ 500 ERROR MUSNAH"
+echo "✅ SETTINGS NORMAL"
+echo "🔓 500 ERROR HILANG"
