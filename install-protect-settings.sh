@@ -3,37 +3,34 @@ set -e
 
 PANEL="/var/www/pterodactyl"
 
-SETTINGS_CONTROLLER="$PANEL/app/Http/Controllers/Admin/Settings/SettingsController.php"
+CONTROLLER="$PANEL/app/Http/Controllers/Admin/SettingsController.php"
 ERROR_VIEW="$PANEL/resources/views/errors/403.blade.php"
 
 DOMAIN="$1"
-URL_WA="$2"
+WA="$2"
 AVATAR="$3"
 
 [ -z "$AVATAR" ] && AVATAR="https://files.catbox.moe/1s2o5m.jpg"
 
-if [ -z "$DOMAIN" ] || [ -z "$URL_WA" ]; then
-  echo "PAKAI:"
-  echo "bash install-protect-settings.sh https://panel.com https://wa.me/628xxx"
+if [ -z "$DOMAIN" ] || [ -z "$WA" ]; then
+  echo "CONTOH:"
+  echo "bash install-protect-settings.sh https://panel.example.com https://wa.me/628xxx"
   exit 1
 fi
 
-echo "🔥 INSTALL SETTINGS PROTECT (OWNER ONLY)"
+echo "🔥 INSTALL SETTINGS PROTECT (ONLY ID 1)"
 
 # ================= BACKUP =================
-if [ -f "$SETTINGS_CONTROLLER" ]; then
-  cp "$SETTINGS_CONTROLLER" "$SETTINGS_CONTROLLER.bak_$(date +%s)"
-  echo "📦 Backup SettingsController"
-fi
+cp "$CONTROLLER" "$CONTROLLER.bak_$(date +%s)"
+echo "📦 Backup SettingsController"
 
-# ================= SETTINGS CONTROLLER =================
-cat > "$SETTINGS_CONTROLLER" << 'PHP'
+# ================= PATCH CONTROLLER =================
+cat > "$CONTROLLER" << 'PHP'
 <?php
 
-namespace Pterodactyl\Http\Controllers\Admin\Settings;
+namespace Pterodactyl\Http\Controllers\Admin;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 use Pterodactyl\Http\Controllers\Controller;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 
@@ -42,6 +39,7 @@ class SettingsController extends Controller
     public function __construct(private ViewFactory $view)
     {
         $user = Auth::user();
+
         if (!$user || $user->id !== 1) {
             abort(403);
         }
@@ -64,7 +62,7 @@ class SettingsController extends Controller
 }
 PHP
 
-# ================= 403 HTML VIEW =================
+# ================= 403 VIEW =================
 mkdir -p "$(dirname "$ERROR_VIEW")"
 
 cat > "$ERROR_VIEW" << HTML
@@ -254,10 +252,10 @@ HTML
 cd "$PANEL"
 php artisan optimize:clear
 
-chmod 644 "$SETTINGS_CONTROLLER" "$ERROR_VIEW"
+chmod 644 "$CONTROLLER" "$ERROR_VIEW"
 
-echo "✅ SETTINGS PROTECT AKTIF"
+echo "✅ SETTINGS PROTECT AKTIF (HARD LOCK)"
 echo "🔒 /admin/settings"
 echo "🔒 /admin/settings/mail"
 echo "🔒 /admin/settings/advanced"
-echo "👑 OWNER ONLY (ID 1)"
+echo "👑 ONLY USER ID = 1"
