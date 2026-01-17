@@ -2,59 +2,40 @@
 set -e
 
 PANEL="/var/www/pterodactyl"
+TMP="/tmp/ptero-fix"
 
-MIDDLEWARE="$PANEL/app/Http/Middleware/OwnerOnlySettings.php"
-KERNEL="$PANEL/app/Http/Kernel.php"
-ROUTES="$PANEL/routes/admin.php"
+echo "🚑 EMERGENCY FIX PTERODACTYL CORE"
 
-ERROR403="$PANEL/resources/views/errors/403.blade.php"
-ERROR500="$PANEL/resources/views/errors/500.blade.php"
+mkdir -p "$TMP"
+cd "$TMP"
 
-echo "🧹 UNINSTALL PROTECT SETTINGS (FULL CLEAN)"
+echo "⬇️ Download core Pterodactyl routes & controllers..."
+curl -sSL https://github.com/pterodactyl/panel/archive/refs/heads/develop.zip -o panel.zip
+unzip -q panel.zip
 
-# ================= REMOVE MIDDLEWARE FILE =================
-if [ -f "$MIDDLEWARE" ]; then
-  rm -f "$MIDDLEWARE"
-  echo "✅ Middleware dihapus"
-else
-  echo "⚠️ Middleware tidak ditemukan"
-fi
+SRC="$TMP/panel-develop"
 
-# ================= REMOVE KERNEL REGISTER =================
-if grep -q "OwnerOnlySettings" "$KERNEL"; then
-  sed -i "/OwnerOnlySettings::class/d" "$KERNEL"
-  sed -i "/owner.settings/d" "$KERNEL"
-  echo "✅ Kernel dibersihkan"
-else
-  echo "⚠️ Kernel sudah bersih"
-fi
+echo "🔄 RESTORE routes/admin.php"
+cp "$SRC/routes/admin.php" "$PANEL/routes/admin.php"
 
-# ================= REMOVE ROUTE PROTECT =================
-if grep -q "owner.settings" "$ROUTES"; then
-  sed -i "/owner.settings/d" "$ROUTES"
-  sed -i "/settings\\\\\\\\AdvancedController/d" "$ROUTES"
-  sed -i "/settings\\\\\\\\MailController/d" "$ROUTES"
-  sed -i "/settings', 'Settings/d" "$ROUTES"
-  echo "✅ Route protect dihapus"
-else
-  echo "⚠️ Route protect tidak ditemukan"
-fi
+echo "🔄 RESTORE Settings Controllers"
+mkdir -p "$PANEL/app/Http/Controllers/Admin/Settings"
+cp -r "$SRC/app/Http/Controllers/Admin/Settings/"* \
+      "$PANEL/app/Http/Controllers/Admin/Settings/"
 
-# ================= REMOVE ERROR HTML =================
-if [ -f "$ERROR403" ]; then
-  rm -f "$ERROR403"
-  echo "✅ 403 custom dihapus"
-fi
+echo "🔄 RESTORE Kernel.php"
+cp "$SRC/app/Http/Kernel.php" "$PANEL/app/Http/Kernel.php"
 
-if [ -f "$ERROR500" ]; then
-  rm -f "$ERROR500"
-  echo "✅ 500 custom dihapus"
-fi
+echo "🧹 REMOVE CUSTOM MIDDLEWARE"
+rm -f "$PANEL/app/Http/Middleware/OwnerOnlySettings.php"
 
-# ================= CLEAR CACHE =================
+echo "🧹 REMOVE CUSTOM ERROR PAGES"
+rm -f "$PANEL/resources/views/errors/403.blade.php"
+rm -f "$PANEL/resources/views/errors/500.blade.php"
+
+echo "🧼 CLEAR CACHE"
 cd "$PANEL"
 php artisan optimize:clear
 
-echo "🎉 UNINSTALL SELESAI"
-echo "🔓 SETTINGS SUDAH NORMAL"
-echo "🚀 PANEL BALIK DEFAULT"
+echo "✅ EMERGENCY FIX SELESAI"
+echo "🚀 PANEL HARUS SUDAH HIDUP"
