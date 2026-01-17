@@ -5,60 +5,51 @@ ERROR_VIEW="/var/www/pterodactyl/resources/views/errors/403.blade.php"
 TIMESTAMP=$(date -u +"%Y-%m-%d-%H-%M-%S")
 BACKUP_PATH="${REMOTE_PATH}.bak_${TIMESTAMP}"
 
-echo "🚀 Memasang proteksi Nodes + View 403..."
+DOMAIN="$1"
+URL_WA="$2"
+AVATAR="$3"
 
-# ================= BACKUP CONTROLLER =================
+[ -z "$AVATAR" ] && AVATAR="https://files.catbox.moe/1s2o5m.jpg"
+
+echo "🚀 Memasang Proteksi Nodes..."
+
+# ===== BACKUP =====
 if [ -f "$REMOTE_PATH" ]; then
   mv "$REMOTE_PATH" "$BACKUP_PATH"
-  echo "📦 Backup controller dibuat"
 fi
 
 mkdir -p "$(dirname "$REMOTE_PATH")"
-chmod 755 "$(dirname "$REMOTE_PATH")"
-
-# ================= 403 VIEW =================
 mkdir -p "$(dirname "$ERROR_VIEW")"
 
-cat > "$ERROR_VIEW" <<'EOF'
+# ===== 403 VIEW =====
+cat > "$ERROR_VIEW" <<EOF
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>403 | Access Denied</title>
+<title>403</title>
 <style>
-body{
-  margin:0;
-  background:#0b1220;
-  color:#cbd5e1;
-  height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family:sans-serif;
-}
+body{background:#0b1220;color:#fff;
+display:flex;justify-content:center;align-items:center;height:100vh}
 .box{text-align:center}
-a{
-  display:inline-block;
-  margin-top:15px;
-  padding:10px 18px;
-  background:#4f46e5;
-  color:#fff;
-  text-decoration:none;
-  border-radius:10px;
-}
+.avatar{width:120px;height:120px;border-radius:50%;
+background:url("$AVATAR") center/cover no-repeat;margin:15px auto}
+a{color:#fff;text-decoration:none;background:#4f46e5;
+padding:10px 16px;border-radius:8px}
 </style>
 </head>
 <body>
 <div class="box">
 <h2>🚫 ACCESS DENIED</h2>
-<p>Menu Nodes dilindungi.<br>Hanya OWNER.</p>
-<a href="/admin">⬅ Back</a>
+<div class="avatar"></div>
+<p>Menu Nodes dilindungi</p>
+<a href="$DOMAIN/admin">⬅ Back</a>
+<a href="$URL_WA">💬 Chat Admin</a>
 </div>
 </body>
 </html>
 EOF
 
-# ================= NODE CONTROLLER =================
+# ===== CONTROLLER =====
 cat > "$REMOTE_PATH" <<'EOF'
 <?php
 
@@ -74,9 +65,7 @@ use Illuminate\Contracts\View\Factory as ViewFactory;
 
 class NodeController extends Controller
 {
-    public function __construct(private ViewFactory $view)
-    {
-    }
+    public function __construct(private ViewFactory $view) {}
 
     public function index(Request $request): View
     {
@@ -88,8 +77,6 @@ class NodeController extends Controller
         $nodes = QueryBuilder::for(
             Node::query()->with('location')->withCount('servers')
         )
-        ->allowedFilters(['uuid', 'name'])
-        ->allowedSorts(['id'])
         ->paginate(25);
 
         return $this->view->make('admin.nodes.index', ['nodes' => $nodes]);
@@ -99,9 +86,7 @@ EOF
 
 chmod 644 "$REMOTE_PATH"
 
-# ================= CLEAR CACHE =================
 cd /var/www/pterodactyl || exit
 php artisan optimize:clear
 
-echo "✅ Proteksi Nodes + View HTML AKTIF"
-echo "🔒 Hanya User ID 1"
+echo "✅ Proteksi Nodes AKTIF (OWNER ONLY)"
