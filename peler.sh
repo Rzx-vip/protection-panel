@@ -1,18 +1,14 @@
 #!/bin/bash
 set -euo pipefail
 
-# =====================================================
-# Protect Panel Pterodactyl - Nodes Hard Lock
-# By RezzX
-# - Multi Admin ID via jsonbin.io (optional)
-# - Fallback ID 1
-# =====================================================
+# ==============================
+# Protect Panel Pterodactyl
+# By RezzX (FIXED)
+# ==============================
 
-IP="$1"
-PASS="$2"
-DOMAIN="$3"
-CHAT_ADMIN="${4:-}"
-JSONBIN_URL="${5:-}"
+DOMAIN="${1:-}"
+CHAT_ADMIN="${2:-}"
+JSONBIN_URL="${3:-}"
 
 BASE="/var/www/pterodactyl"
 MW="$BASE/app/Http/Middleware/ProtectNodes.php"
@@ -54,8 +50,7 @@ class ProtectNodes
         }
 
         if (!\$user || !in_array((int)\$user->id, \$allowed)) {
-            return response()
-                ->view('errors.protect-nodes', [], 403);
+            return response()->view('errors.protect-nodes', [], 403);
         }
 
         return \$next(\$request);
@@ -64,7 +59,7 @@ class ProtectNodes
 EOF
 
 # ===============================
-# HTML VIEW (PAKAI HTML KAMU)
+# HTML VIEW
 # ===============================
 mkdir -p "$(dirname "$VIEW")"
 
@@ -73,43 +68,26 @@ cat > "$VIEW" <<EOF
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>403 | Protect Panel RezzX</title>
-
+<title>403 | Node Locked</title>
 <style>
-$(sed 's/\$/\\$/g' <<'CSS'
-:root {
-  --bg:#0b1220;--text:#cbd5e1;--muted:#64748b;--danger:#ef4444;
-}
-body{margin:0;background:radial-gradient(circle at top,#0f172a,var(--bg));
-min-height:100vh;display:flex;justify-content:center;align-items:center;color:var(--text);font-family:Segoe UI,sans-serif}
-.avatar{width:130px;height:130px;margin:0 auto 15px;border-radius:50%;
-background:url("https://i.pinimg.com/736x/9b/77/03/9b7703e7935e9a84f47623d24228bf82.jpg") center/cover no-repeat;
-box-shadow:0 0 25px rgba(99,102,241,.6)}
-.btn{padding:12px 22px;border-radius:12px;color:#fff;
-background:linear-gradient(135deg,#0ea5e9,#6366f1);text-decoration:none;font-weight:bold}
-CSS
-)
+body{background:#0b1220;color:#cbd5e1;font-family:sans-serif;
+display:flex;align-items:center;justify-content:center;height:100vh}
+.btn{padding:12px 20px;border-radius:10px;
+background:#6366f1;color:white;text-decoration:none;font-weight:bold}
 </style>
 </head>
-
 <body>
 <div style="text-align:center">
-<h2 style="color:#ef4444">🚫 403 | NODE AREA LOCKED</h2>
-<div class="avatar"></div>
-
-<p>Hanya admin tertentu yang dapat mengakses Node Panel.</p>
-
-<div style="margin-top:20px">
+<h2>🚫 NODE AREA LOCKED</h2>
+<p>Akses dibatasi untuk admin tertentu.</p>
 <a class="btn" href="${DOMAIN}/admin">⬅ BACK</a>
 EOF
 
 if [ -n "$CHAT_ADMIN" ]; then
-  echo "<a class=\"btn\" href=\"$CHAT_ADMIN\">💬 CHAT ADMIN</a>" >> "$VIEW"
+  echo "<br><br><a class=\"btn\" href=\"$CHAT_ADMIN\">💬 CHAT ADMIN</a>" >> "$VIEW"
 fi
 
 cat >> "$VIEW" <<EOF
-</div>
 </div>
 </body>
 </html>
@@ -120,17 +98,10 @@ EOF
 # ===============================
 grep -q protect.nodes "$KERNEL" || sed -i "/routeMiddleware/a\        'protect.nodes' => \\\\Pterodactyl\\\\Http\\\\Middleware\\\\ProtectNodes::class," "$KERNEL"
 
-# ===============================
-# Inject ke routes/admin.php
-# ===============================
 sed -i "s/prefix' => 'nodes'/prefix' => 'nodes', 'middleware' => ['protect.nodes']/" "$ROUTES"
 
-# ===============================
-# Permission
-# ===============================
 chown -R www-data:www-data "$BASE"
 php artisan view:clear
 php artisan route:clear
 
 echo "✅ NODE PROTECTION ACTIVE"
-echo "🔒 Allowed Admin: ID 1 ${JSONBIN_URL:+(+ jsonbin.io)}"
