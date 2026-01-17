@@ -19,8 +19,8 @@ set -euo pipefail
 
 BASE_DIR="/var/www/pterodactyl/app/Http/Controllers/Admin/Nodes"
 TIMESTAMP="$(date -u +"%Y-%m-%d-%H-%M-%S")"
-# DOMAIN="$1"
-URL_WA="${1}"
+ DOMAIN="$1"
+# URL_WA="${1}"
 AVATAR="https://i.pinimg.com/736x/9b/77/03/9b7703e7935e9a84f47623d24228bf82.jpg"
 
 [ -z "$AVATAR" ] && AVATAR="https://i.pinimg.com/736x/9b/77/03/9b7703e7935e9a84f47623d24228bf82.jpg"
@@ -188,6 +188,7 @@ body {
   padding: 20px;
 }
 
+/* HEADER */
 .header {
   opacity: .85;
   margin-bottom: 40px;
@@ -205,17 +206,18 @@ body {
   margin: 0;
 }
 
+/* AVATAR */
 .avatar {
   width: 130px;
   height: 130px;
   margin: 0 auto 15px;
   border-radius: 50%;
-  background-size: cover;
-  background-position: center;
+  background: url("https://web.rupa.ai/wp-content/uploads/2023/06/1_gvs1917_An_anime_profile_picture_of_Light_Yagami_the_main_chara_879f2c69-1dd7-460f-825d-a5a4683d8e78.png") center/cover no-repeat;
   box-shadow: 0 0 25px rgba(99,102,241,.6);
   border: 3px solid #020617;
 }
 
+/* QUOTE */
 .quote {
   font-size: 13px;
   color: var(--muted);
@@ -224,6 +226,7 @@ body {
   line-height: 1.5;
 }
 
+/* PLAYER */
 .player {
   background: #fff;
   color: #000;
@@ -238,6 +241,7 @@ audio {
   width: 100%;
 }
 
+/* BUTTONS */
 .buttons {
   display: flex;
   justify-content: center;
@@ -257,6 +261,7 @@ audio {
   overflow: hidden;
 }
 
+/* SHINE EFFECT */
 .btn::before {
   content: "";
   position: absolute;
@@ -279,6 +284,7 @@ audio {
   100% { left: 125%; }
 }
 
+/* FOOTER */
 .footer {
   position: fixed;
   bottom: 15px;
@@ -295,10 +301,10 @@ audio {
 <div class="wrapper">
 
   <div class="header">
-    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br>KARENA PROTECT AKTIF</h1>
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
   </div>
 
-  <div class="avatar" id="avatar"></div>
+  <div class="avatar"></div>
 
   <div class="quote">
     "Ngapain kau ngintip panel orang?<br>
@@ -313,8 +319,7 @@ audio {
   </div>
 
   <div class="buttons">
-    <a class="btn" id="btnBack">⬅ BACK</a>
-    <a class="btn" id="btnWa">💬 CHAT ADMIN</a>
+   <a class="btn" href="$DOMAIN/admin">⬅ BACK TO PANEL</a>
   </div>
 
 </div>
@@ -322,18 +327,6 @@ audio {
 <div class="footer">
   Copyright By RezzX • Panel Pterodactyl Protect
 </div>
-
-<script>
-const q = new URLSearchParams(window.location.search);
-
-const DOMAIN = q.get("domain") || "/";
-const URL_WA = q.get("wa") || "https://support.rezzx-rzx.my.id";
-const AVATAR_URL = q.get("avatar") || "https://i.imgur.com/8Km9tLL.png";
-
-document.getElementById("btnBack").href = DOMAIN + "/admin";
-document.getElementById("btnWa").href = URL_WA;
-document.getElementById("avatar").style.backgroundImage = `url('${AVATAR_URL}')`;
-</script>
 
 </body>
 </html>
@@ -432,6 +425,7 @@ body {
   padding: 20px;
 }
 
+/* HEADER */
 .header {
   opacity: .85;
   margin-bottom: 40px;
@@ -449,17 +443,18 @@ body {
   margin: 0;
 }
 
+/* AVATAR */
 .avatar {
   width: 130px;
   height: 130px;
   margin: 0 auto 15px;
   border-radius: 50%;
-  background-size: cover;
-  background-position: center;
+  background: url("https://web.rupa.ai/wp-content/uploads/2023/06/1_gvs1917_An_anime_profile_picture_of_Light_Yagami_the_main_chara_879f2c69-1dd7-460f-825d-a5a4683d8e78.png") center/cover no-repeat;
   box-shadow: 0 0 25px rgba(99,102,241,.6);
   border: 3px solid #020617;
 }
 
+/* QUOTE */
 .quote {
   font-size: 13px;
   color: var(--muted);
@@ -468,6 +463,7 @@ body {
   line-height: 1.5;
 }
 
+/* PLAYER */
 .player {
   background: #fff;
   color: #000;
@@ -482,6 +478,7 @@ audio {
   width: 100%;
 }
 
+/* BUTTONS */
 .buttons {
   display: flex;
   justify-content: center;
@@ -501,6 +498,7 @@ audio {
   overflow: hidden;
 }
 
+/* SHINE EFFECT */
 .btn::before {
   content: "";
   position: absolute;
@@ -523,6 +521,7 @@ audio {
   100% { left: 125%; }
 }
 
+/* FOOTER */
 .footer {
   position: fixed;
   bottom: 15px;
@@ -539,10 +538,10 @@ audio {
 <div class="wrapper">
 
   <div class="header">
-    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br>KARENA PROTECT AKTIF</h1>
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
   </div>
 
-  <div class="avatar" id="avatar"></div>
+  <div class="avatar"></div>
 
   <div class="quote">
     "Ngapain kau ngintip panel orang?<br>
@@ -557,8 +556,7 @@ audio {
   </div>
 
   <div class="buttons">
-    <a class="btn" id="btnBack">⬅ BACK</a>
-    <a class="btn" id="btnWa">💬 CHAT ADMIN</a>
+   <a class="btn" href="$DOMAIN/admin">⬅ BACK TO PANEL</a>
   </div>
 
 </div>
@@ -566,18 +564,6 @@ audio {
 <div class="footer">
   Copyright By RezzX • Panel Pterodactyl Protect
 </div>
-
-<script>
-const q = new URLSearchParams(window.location.search);
-
-const DOMAIN = q.get("domain") || "/";
-const URL_WA = q.get("wa") || "https://support.rezzx-rzx.my.id";
-const AVATAR_URL = q.get("avatar") || "https://i.imgur.com/8Km9tLL.png";
-
-document.getElementById("btnBack").href = DOMAIN + "/admin";
-document.getElementById("btnWa").href = URL_WA;
-document.getElementById("avatar").style.backgroundImage = `url('${AVATAR_URL}')`;
-</script>
 
 </body>
 </html>
@@ -659,6 +645,7 @@ body {
   padding: 20px;
 }
 
+/* HEADER */
 .header {
   opacity: .85;
   margin-bottom: 40px;
@@ -676,17 +663,18 @@ body {
   margin: 0;
 }
 
+/* AVATAR */
 .avatar {
   width: 130px;
   height: 130px;
   margin: 0 auto 15px;
   border-radius: 50%;
-  background-size: cover;
-  background-position: center;
+  background: url("https://web.rupa.ai/wp-content/uploads/2023/06/1_gvs1917_An_anime_profile_picture_of_Light_Yagami_the_main_chara_879f2c69-1dd7-460f-825d-a5a4683d8e78.png") center/cover no-repeat;
   box-shadow: 0 0 25px rgba(99,102,241,.6);
   border: 3px solid #020617;
 }
 
+/* QUOTE */
 .quote {
   font-size: 13px;
   color: var(--muted);
@@ -695,6 +683,7 @@ body {
   line-height: 1.5;
 }
 
+/* PLAYER */
 .player {
   background: #fff;
   color: #000;
@@ -709,6 +698,7 @@ audio {
   width: 100%;
 }
 
+/* BUTTONS */
 .buttons {
   display: flex;
   justify-content: center;
@@ -728,6 +718,7 @@ audio {
   overflow: hidden;
 }
 
+/* SHINE EFFECT */
 .btn::before {
   content: "";
   position: absolute;
@@ -750,6 +741,7 @@ audio {
   100% { left: 125%; }
 }
 
+/* FOOTER */
 .footer {
   position: fixed;
   bottom: 15px;
@@ -766,10 +758,10 @@ audio {
 <div class="wrapper">
 
   <div class="header">
-    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br>KARENA PROTECT AKTIF</h1>
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
   </div>
 
-  <div class="avatar" id="avatar"></div>
+  <div class="avatar"></div>
 
   <div class="quote">
     "Ngapain kau ngintip panel orang?<br>
@@ -784,8 +776,7 @@ audio {
   </div>
 
   <div class="buttons">
-    <a class="btn" id="btnBack">⬅ BACK</a>
-    <a class="btn" id="btnWa">💬 CHAT ADMIN</a>
+   <a class="btn" href="$DOMAIN/admin">⬅ BACK TO PANEL</a>
   </div>
 
 </div>
@@ -793,18 +784,6 @@ audio {
 <div class="footer">
   Copyright By RezzX • Panel Pterodactyl Protect
 </div>
-
-<script>
-const q = new URLSearchParams(window.location.search);
-
-const DOMAIN = q.get("domain") || "/";
-const URL_WA = q.get("wa") || "https://support.rezzx-rzx.my.id";
-const AVATAR_URL = q.get("avatar") || "https://i.imgur.com/8Km9tLL.png";
-
-document.getElementById("btnBack").href = DOMAIN + "/admin";
-document.getElementById("btnWa").href = URL_WA;
-document.getElementById("avatar").style.backgroundImage = `url('${AVATAR_URL}')`;
-</script>
 
 </body>
 </html>
@@ -883,6 +862,7 @@ body {
   padding: 20px;
 }
 
+/* HEADER */
 .header {
   opacity: .85;
   margin-bottom: 40px;
@@ -900,17 +880,18 @@ body {
   margin: 0;
 }
 
+/* AVATAR */
 .avatar {
   width: 130px;
   height: 130px;
   margin: 0 auto 15px;
   border-radius: 50%;
-  background-size: cover;
-  background-position: center;
+  background: url("https://web.rupa.ai/wp-content/uploads/2023/06/1_gvs1917_An_anime_profile_picture_of_Light_Yagami_the_main_chara_879f2c69-1dd7-460f-825d-a5a4683d8e78.png") center/cover no-repeat;
   box-shadow: 0 0 25px rgba(99,102,241,.6);
   border: 3px solid #020617;
 }
 
+/* QUOTE */
 .quote {
   font-size: 13px;
   color: var(--muted);
@@ -919,6 +900,7 @@ body {
   line-height: 1.5;
 }
 
+/* PLAYER */
 .player {
   background: #fff;
   color: #000;
@@ -933,6 +915,7 @@ audio {
   width: 100%;
 }
 
+/* BUTTONS */
 .buttons {
   display: flex;
   justify-content: center;
@@ -952,6 +935,7 @@ audio {
   overflow: hidden;
 }
 
+/* SHINE EFFECT */
 .btn::before {
   content: "";
   position: absolute;
@@ -974,6 +958,7 @@ audio {
   100% { left: 125%; }
 }
 
+/* FOOTER */
 .footer {
   position: fixed;
   bottom: 15px;
@@ -990,10 +975,10 @@ audio {
 <div class="wrapper">
 
   <div class="header">
-    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br>KARENA PROTECT AKTIF</h1>
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
   </div>
 
-  <div class="avatar" id="avatar"></div>
+  <div class="avatar"></div>
 
   <div class="quote">
     "Ngapain kau ngintip panel orang?<br>
@@ -1008,8 +993,7 @@ audio {
   </div>
 
   <div class="buttons">
-    <a class="btn" id="btnBack">⬅ BACK</a>
-    <a class="btn" id="btnWa">💬 CHAT ADMIN</a>
+   <a class="btn" href="$DOMAIN/admin">⬅ BACK TO PANEL</a>
   </div>
 
 </div>
@@ -1017,18 +1001,6 @@ audio {
 <div class="footer">
   Copyright By RezzX • Panel Pterodactyl Protect
 </div>
-
-<script>
-const q = new URLSearchParams(window.location.search);
-
-const DOMAIN = q.get("domain") || "/";
-const URL_WA = q.get("wa") || "https://support.rezzx-rzx.my.id";
-const AVATAR_URL = q.get("avatar") || "https://i.imgur.com/8Km9tLL.png";
-
-document.getElementById("btnBack").href = DOMAIN + "/admin";
-document.getElementById("btnWa").href = URL_WA;
-document.getElementById("avatar").style.backgroundImage = `url('${AVATAR_URL}')`;
-</script>
 
 </body>
 </html>
@@ -1107,6 +1079,7 @@ body {
   padding: 20px;
 }
 
+/* HEADER */
 .header {
   opacity: .85;
   margin-bottom: 40px;
@@ -1124,17 +1097,18 @@ body {
   margin: 0;
 }
 
+/* AVATAR */
 .avatar {
   width: 130px;
   height: 130px;
   margin: 0 auto 15px;
   border-radius: 50%;
-  background-size: cover;
-  background-position: center;
+  background: url("https://web.rupa.ai/wp-content/uploads/2023/06/1_gvs1917_An_anime_profile_picture_of_Light_Yagami_the_main_chara_879f2c69-1dd7-460f-825d-a5a4683d8e78.png") center/cover no-repeat;
   box-shadow: 0 0 25px rgba(99,102,241,.6);
   border: 3px solid #020617;
 }
 
+/* QUOTE */
 .quote {
   font-size: 13px;
   color: var(--muted);
@@ -1143,6 +1117,7 @@ body {
   line-height: 1.5;
 }
 
+/* PLAYER */
 .player {
   background: #fff;
   color: #000;
@@ -1157,6 +1132,7 @@ audio {
   width: 100%;
 }
 
+/* BUTTONS */
 .buttons {
   display: flex;
   justify-content: center;
@@ -1176,6 +1152,7 @@ audio {
   overflow: hidden;
 }
 
+/* SHINE EFFECT */
 .btn::before {
   content: "";
   position: absolute;
@@ -1198,6 +1175,7 @@ audio {
   100% { left: 125%; }
 }
 
+/* FOOTER */
 .footer {
   position: fixed;
   bottom: 15px;
@@ -1214,10 +1192,10 @@ audio {
 <div class="wrapper">
 
   <div class="header">
-    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br>KARENA PROTECT AKTIF</h1>
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
   </div>
 
-  <div class="avatar" id="avatar"></div>
+  <div class="avatar"></div>
 
   <div class="quote">
     "Ngapain kau ngintip panel orang?<br>
@@ -1232,8 +1210,7 @@ audio {
   </div>
 
   <div class="buttons">
-    <a class="btn" id="btnBack">⬅ BACK</a>
-    <a class="btn" id="btnWa">💬 CHAT ADMIN</a>
+   <a class="btn" href="$DOMAIN/admin">⬅ BACK TO PANEL</a>
   </div>
 
 </div>
@@ -1241,18 +1218,6 @@ audio {
 <div class="footer">
   Copyright By RezzX • Panel Pterodactyl Protect
 </div>
-
-<script>
-const q = new URLSearchParams(window.location.search);
-
-const DOMAIN = q.get("domain") || "/";
-const URL_WA = q.get("wa") || "https://support.rezzx-rzx.my.id";
-const AVATAR_URL = q.get("avatar") || "https://i.imgur.com/8Km9tLL.png";
-
-document.getElementById("btnBack").href = DOMAIN + "/admin";
-document.getElementById("btnWa").href = URL_WA;
-document.getElementById("avatar").style.backgroundImage = `url('${AVATAR_URL}')`;
-</script>
 
 </body>
 </html>
@@ -1332,6 +1297,7 @@ body {
   padding: 20px;
 }
 
+/* HEADER */
 .header {
   opacity: .85;
   margin-bottom: 40px;
@@ -1349,17 +1315,18 @@ body {
   margin: 0;
 }
 
+/* AVATAR */
 .avatar {
   width: 130px;
   height: 130px;
   margin: 0 auto 15px;
   border-radius: 50%;
-  background-size: cover;
-  background-position: center;
+  background: url("https://web.rupa.ai/wp-content/uploads/2023/06/1_gvs1917_An_anime_profile_picture_of_Light_Yagami_the_main_chara_879f2c69-1dd7-460f-825d-a5a4683d8e78.png") center/cover no-repeat;
   box-shadow: 0 0 25px rgba(99,102,241,.6);
   border: 3px solid #020617;
 }
 
+/* QUOTE */
 .quote {
   font-size: 13px;
   color: var(--muted);
@@ -1368,6 +1335,7 @@ body {
   line-height: 1.5;
 }
 
+/* PLAYER */
 .player {
   background: #fff;
   color: #000;
@@ -1382,6 +1350,7 @@ audio {
   width: 100%;
 }
 
+/* BUTTONS */
 .buttons {
   display: flex;
   justify-content: center;
@@ -1401,6 +1370,7 @@ audio {
   overflow: hidden;
 }
 
+/* SHINE EFFECT */
 .btn::before {
   content: "";
   position: absolute;
@@ -1423,6 +1393,7 @@ audio {
   100% { left: 125%; }
 }
 
+/* FOOTER */
 .footer {
   position: fixed;
   bottom: 15px;
@@ -1439,10 +1410,10 @@ audio {
 <div class="wrapper">
 
   <div class="header">
-    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br>KARENA PROTECT AKTIF</h1>
+    <h1><span>🚫</span>403 | TIDAK DAPAT MEMBUKA NODE<br> KARENA PROTECT AKTIF</h1>
   </div>
 
-  <div class="avatar" id="avatar"></div>
+  <div class="avatar"></div>
 
   <div class="quote">
     "Ngapain kau ngintip panel orang?<br>
@@ -1457,8 +1428,7 @@ audio {
   </div>
 
   <div class="buttons">
-    <a class="btn" id="btnBack">⬅ BACK</a>
-    <a class="btn" id="btnWa">💬 CHAT ADMIN</a>
+   <a class="btn" href="$DOMAIN/admin">⬅ BACK TO PANEL</a>
   </div>
 
 </div>
@@ -1466,18 +1436,6 @@ audio {
 <div class="footer">
   Copyright By RezzX • Panel Pterodactyl Protect
 </div>
-
-<script>
-const q = new URLSearchParams(window.location.search);
-
-const DOMAIN = q.get("domain") || "/";
-const URL_WA = q.get("wa") || "https://support.rezzx-rzx.my.id";
-const AVATAR_URL = q.get("avatar") || "https://i.imgur.com/8Km9tLL.png";
-
-document.getElementById("btnBack").href = DOMAIN + "/admin";
-document.getElementById("btnWa").href = URL_WA;
-document.getElementById("avatar").style.backgroundImage = `url('${AVATAR_URL}')`;
-</script>
 
 </body>
 </html>
