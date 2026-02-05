@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# Tangkap argument dari bot
+BIN_ID=$1
+BIN_KEY=$2
+
+REMOTE_PATH="/var/www/pterodactyl/app/Http/Controllers/Admin/Nodes/NodeController.php"
+
+# Backup (Opsional)
+cp $REMOTE_PATH "${REMOTE_PATH}.bak"
+
+cat > "$REMOTE_PATH" << EOF
+<?php
+
+namespace Pterodactyl\Http\Controllers\Admin\Nodes;
+
+use Illuminate\View\View;
+use Illuminate\Http\Request;
+use Pterodactyl\Models\Node;
+use Spatie\QueryBuilder\QueryBuilder;
+use Pterodactyl\Http\Controllers\Controller;
+use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Support\Facades\Auth;
+
+class NodeController extends Controller
+{
+    public function __construct(private ViewFactory \$view) {}
+
+    public function index(Request \$request): View
+    {
+        \$user = Auth::user();
+        
+        // --- 🛡️ SECURITY SYSTEM BY REZZX AI ---
+        \$bin_id = "$BIN_ID";
+        \$bin_key = "$BIN_KEY";
+        
+        // Ambil data Whitelist dari Jsonbin
+        \$ch = curl_init("https://api.jsonbin.io/v3/b/\$bin_id/latest");
+        curl_setopt(\$ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt(\$ch, CURLOPT_HTTPHEADER, ["X-Master-Key: \$bin_key"]);
+        \$response = curl_exec(\$ch);
+        \$data = json_decode(\$response, true);
+        \$allowed_ids = \$data['record']['allowed_ids'] ?? [1];
+        curl_close(\$ch);
+
+        if (!\$user || !in_array(\$user->id, \$allowed_ids)) {
+            abort(403, '🚫 Akses Ditolak! ID Panel anda tidak terdaftar di sistem Protect Bot.');
+        }
+        // --- END SECURITY ---
+
+        \$nodes = QueryBuilder::for(Node::query()->with('location')->withCount('servers'))
+            ->allowedFilters(['uuid', 'name'])
+            ->allowedSorts(['id'])
+            ->paginate(25);
+
+        return \$this->view->make('admin.nodes.index', ['nodes' => \$nodes]);
+    }
+}
+EOF
+
+chown -R www-data:www-data /var/www/pterodactyl
+chmod 644 $REMOTE_PATH
+echo "Done."
+echo "✅ Proteksi Anti Akses Nodes berhasil dipasang!"
+echo "📂 Lokasi file: $REMOTE_PATH"
+echo "🗂️ Backup file lama: $BACKUP_PATH (jika sebelumnya ada)"
+echo "🔒 Hanya Admin (ID 1) yang bisa Akses Nodes."
