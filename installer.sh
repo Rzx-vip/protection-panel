@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# REZZX VVIP THEME INSTALLER - REAL LOGIN FIX
+# REZZX VVIP THEME INSTALLER - REAL LOGIN FIX V2
 # ==========================================
 
 CYAN='\033[0;36m'
@@ -12,9 +12,9 @@ NC='\033[0m'
 
 clear
 echo -e "${PURPLE}================================================================${NC}"
-echo -e "${CYAN}        REZZX VVIP - 100% REAL LOGIN INTEGRATION API            ${NC}"
+echo -e "${CYAN}        REZZX VVIP - 100% REAL LOGIN INTEGRATION API V2         ${NC}"
 echo -e "${PURPLE}================================================================${NC}"
-echo -e "${GREEN}[+] Fix error dummy form, mengkoneksikan ke database...${NC}"
+echo -e "${GREEN}[+] Fix API Session Cookies & Logo Centering...${NC}"
 sleep 2
 
 PTERO_DIR="/var/www/pterodactyl"
@@ -25,7 +25,7 @@ if [ ! -f "$WRAPPER" ]; then
     exit
 fi
 
-# Mengembalikan ke file original dulu biar nggak numpuk kodenya
+# Mengembalikan ke file original dulu biar bersih
 if [ -f "$WRAPPER.rezzx.bak" ]; then
     cp "$WRAPPER.rezzx.bak" $WRAPPER
     echo -e "${GREEN}[+] Membersihkan injeksi lama...${NC}"
@@ -33,13 +33,11 @@ else
     cp $WRAPPER "$WRAPPER.rezzx.bak"
 fi
 
-echo -e "${CYAN}[~] Menyuntikkan kode HTML/CSS dengan REAL API AUTH...${NC}"
+echo -e "${CYAN}[~] Menyuntikkan kode HTML/CSS VVIP ke sistem...${NC}"
 
-# Menghapus tag penutup body dan html bawaan sementara
 sed -i '/<\/body>/d' $WRAPPER
 sed -i '/<\/html>/d' $WRAPPER
 
-# Memasukkan kode HTML VVIP REAL LOGIN
 cat << 'EOF' >> $WRAPPER
 
 <div id="rezzx-vip-theme" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 999999; background-color: #050508; overflow: hidden; font-family: 'Rajdhani', sans-serif;">
@@ -67,9 +65,12 @@ cat << 'EOF' >> $WRAPPER
         .glass-card { width: 100%; max-width: 400px; background: var(--card-bg); border: 1px solid rgba(0, 243, 255, 0.15); border-radius: 16px; padding: 35px 25px; backdrop-filter: blur(20px); box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0, 243, 255, 0.05); position: relative; }
         .glass-card::before { content: ''; position: absolute; top: 0; left: 10%; width: 80%; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); box-shadow: 0 0 15px var(--neon-cyan); }
         .logo-wrapper { text-align: center; margin-bottom: 25px; }
-        .ptero-logo { width: 70px; height: 70px; filter: drop-shadow(0 0 10px var(--neon-cyan)); margin-bottom: 10px; animation: float 4s ease-in-out infinite; }
-        .card-title { font-family: var(--font-title); font-size: 1.4rem; letter-spacing: 2px; }
-        .card-subtitle { font-family: var(--font-code); font-size: 0.75rem; color: var(--neon-purple); letter-spacing: 1px; }
+        
+        /* FIX LOGO MENCENG: Display block dan margin auto */
+        .ptero-logo { width: 70px; height: 70px; filter: drop-shadow(0 0 10px var(--neon-cyan)); display: block; margin: 0 auto 10px auto; animation: float 4s ease-in-out infinite; }
+        
+        .card-title { font-family: var(--font-title); font-size: 1.4rem; letter-spacing: 2px; text-align: center; }
+        .card-subtitle { font-family: var(--font-code); font-size: 0.75rem; color: var(--neon-purple); letter-spacing: 1px; text-align: center; }
         .input-box { position: relative; margin-bottom: 20px; }
         .input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666; font-size: 1rem; transition: 0.3s; }
         .cyber-input { width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 14px 15px 14px 45px; color: #fff; font-family: var(--font-ui); font-size: 1rem; transition: all 0.3s ease; }
@@ -127,36 +128,30 @@ cat << 'EOF' >> $WRAPPER
 </div>
 
 <script>
-    // Hanya tampilkan jika di halaman login
     if (window.location.pathname.includes('/auth/login')) {
         document.getElementById('rezzx-vip-theme').style.display = 'flex';
         
-        // Hapus elemen bawaan biar nggak bocor ke bawah
         const appElement = document.getElementById('app');
         if(appElement) { appElement.style.display = 'none'; }
         
-        // Efek Ketik
         const alertMsg = "WARNING: UNAUTHORIZED SYSTEM ACCESS WILL BE LOGGED AND BLOCKED BY FIREWALL.";
         const alertEl = document.getElementById('alert-text'); let i = 0; let isDeleting = false;
         function typeAlert() { if(!alertEl) return; if (isDeleting) { alertEl.textContent = alertMsg.substring(0, i - 1); i--; if (i === 0) { isDeleting = false; setTimeout(typeAlert, 500); } else { setTimeout(typeAlert, 20); } } else { alertEl.textContent = alertMsg.substring(0, i + 1); i++; if (i === alertMsg.length) { isDeleting = true; setTimeout(typeAlert, 10000); } else { setTimeout(typeAlert, 60); } } }
         setTimeout(typeAlert, 500);
 
-        // Jam
         function runClock() { const clockEl = document.getElementById('clock'); const dateEl = document.getElementById('date'); if(!clockEl) return; const date = new Date(); clockEl.textContent = date.toLocaleTimeString('en-GB'); dateEl.textContent = date.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase().replace(/ /g, '-'); }
         setInterval(runClock, 1000); runClock();
 
-        // Music
         const audio = document.getElementById('bg-audio'); const btnMusic = document.getElementById('musicBtn'); const iconMusic = document.getElementById('musicIcon');
         if(btnMusic) { btnMusic.addEventListener('click', () => { if(audio.paused) { audio.play(); iconMusic.className = 'fas fa-pause'; btnMusic.classList.add('playing'); } else { audio.pause(); iconMusic.className = 'fas fa-play'; btnMusic.classList.remove('playing'); } }); }
 
-        // Matrix
         const cvs = document.getElementById('matrix-canvas'); const ctx = cvs.getContext('2d'); let w = cvs.width = window.innerWidth; let h = cvs.height = window.innerHeight;
         const letters = '0123456789REZZXVVIP'.split(''); const fontSize = 12; const cols = w / fontSize; const drops = []; for(let x = 0; x < cols; x++) drops[x] = 1;
         function drawMatrix() { ctx.fillStyle = 'rgba(5, 5, 8, 0.1)'; ctx.fillRect(0, 0, w, h); ctx.fillStyle = '#bc13fe'; ctx.font = fontSize + 'px monospace'; for(let i = 0; i < drops.length; i++) { const text = letters[Math.floor(Math.random() * letters.length)]; if(Math.random() > 0.8) ctx.fillStyle = '#00f3ff'; else ctx.fillStyle = '#bc13fe'; ctx.fillText(text, i * fontSize, drops[i] * fontSize); if(drops[i] * fontSize > h && Math.random() > 0.975) drops[i] = 0; drops[i]++; } }
         setInterval(drawMatrix, 35); window.addEventListener('resize', () => { w = cvs.width = window.innerWidth; h = cvs.height = window.innerHeight; });
 
         // ========================================================
-        // 100% REAL LOGIN INTEGRATION (BYPASS REACT TO LARAVEL)
+        // FIX: TAMBAHKAN KREDENSIAL SESI (credentials: 'same-origin')
         // ========================================================
         const authForm = document.getElementById('authForm');
         if(authForm) {
@@ -169,7 +164,6 @@ cat << 'EOF' >> $WRAPPER
                 const userVal = document.getElementById('ptero_user').value;
                 const passVal = document.getElementById('ptero_password').value;
                 
-                // Ambil CSRF Token Pterodactyl Bawaan
                 const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
                 const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
 
@@ -178,7 +172,6 @@ cat << 'EOF' >> $WRAPPER
                 mainBtn.style.pointerEvents = 'none';
                 mainBtn.classList.remove('error');
 
-                // Tembak API Asli Pterodactyl
                 fetch('/auth/login', {
                     method: 'POST',
                     headers: {
@@ -186,22 +179,26 @@ cat << 'EOF' >> $WRAPPER
                         'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json'
                     },
+                    credentials: 'same-origin', // <-- INI DIA KUNCI FIX-NYA BIAR GA INVALID TERUS!
                     body: JSON.stringify({ user: userVal, password: passVal })
                 })
                 .then(async response => {
                     if(response.ok || response.redirected) {
-                        // BERHASIL LOGIN!
                         mainBtn.classList.add('success');
                         loader.style.display = 'none';
                         btnText.textContent = "ACCESS GRANTED";
                         btnText.style.display = 'block';
-                        
-                        // Lempar ke dalam panel
                         setTimeout(() => { window.location.href = '/'; }, 1000);
                     } else {
-                        // PASSWORD / USERNAME SALAH
                         loader.style.display = 'none';
-                        btnText.textContent = "INVALID CREDENTIALS";
+                        
+                        // Menangkap error spesifik jika server memblokir sesi
+                        if (response.status === 419) {
+                            btnText.textContent = "SESSION EXPIRED (419)";
+                        } else {
+                            btnText.textContent = "INVALID CREDENTIALS";
+                        }
+                        
                         btnText.style.display = 'block';
                         mainBtn.classList.add('error');
                         
@@ -213,7 +210,6 @@ cat << 'EOF' >> $WRAPPER
                     }
                 })
                 .catch(err => {
-                    // ERROR SISTEM
                     loader.style.display = 'none';
                     btnText.textContent = "SYSTEM ERROR";
                     btnText.style.display = 'block';
@@ -234,8 +230,8 @@ php artisan view:clear > /dev/null 2>&1
 php artisan config:clear > /dev/null 2>&1
 
 echo -e "${PURPLE}================================================================${NC}"
-echo -e "${GREEN}       REAL LOGIN OVERRIDE BERHASIL DI-INSTALL!                 ${NC}"
+echo -e "${GREEN}       REAL LOGIN V2 BERHASIL DI-INSTALL!                       ${NC}"
 echo -e "${PURPLE}================================================================${NC}"
-echo -e "${YELLOW}Silakan REFRESH browser kamu sekarang (Tekan Ctrl + F5).${NC}"
-echo -e "${YELLOW}Coba login pakai username dan password panelmu. Pasti bisa masuk!${NC}"
+echo -e "${YELLOW}Silakan REFRESH browser kamu (Ctrl + F5). Logonya udah di tengah${NC}"
+echo -e "${YELLOW}dan loginnya sekarang membaca sesi cookies dengan akurat!${NC}"
 echo -e "${PURPLE}================================================================${NC}"
