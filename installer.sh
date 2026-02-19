@@ -93,7 +93,7 @@ cat << 'EOF' >> $WRAPPER
 
     <canvas id="matrix-canvas"></canvas>
     <div class="vignette"></div>
-    <audio id="bg-audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+    <audio id="bg-audio" src="https://image2url.com/r2/default/audio/1771466790440-f93287e0-159b-46ca-8dba-99069e245417.mp3"></audio>
     
     <div class="top-alert"><div><i class="fas fa-shield-alt" style="color: var(--neon-purple); margin-right: 5px;"></i><span id="alert-text"></span><span class="typing-cursor"></span></div></div>
     
