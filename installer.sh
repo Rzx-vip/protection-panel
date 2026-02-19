@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# REZZX VVIP THEME INSTALLER - NATIVE FORM EDITION
+# REZZX VVIP THEME INSTALLER - THE FINAL API 
 # ==========================================
 
 CYAN='\033[0;36m'
@@ -10,15 +10,15 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-# Menangkap parameter dari bot telegram (IP|PW|Domain)
-TARGET_DOMAIN=${1:-"Pterodactyl Panel"}
+# Menangkap domain dari bot (dikirim lewat $1)
+TARGET_DOMAIN=${1:-"Domain Tidak Diset"}
 
 clear
 echo -e "${PURPLE}================================================================${NC}"
-echo -e "${CYAN}      REZZX VVIP - PURE NATIVE LARAVEL INTEGRATION              ${NC}"
+echo -e "${CYAN}      REZZX VVIP - SANCTUM API INTEGRATION (ANTI ERROR 500)     ${NC}"
 echo -e "${PURPLE}================================================================${NC}"
 echo -e "${GREEN}[+] Target Domain : $TARGET_DOMAIN${NC}"
-echo -e "${GREEN}[+] Membuang API JS & Mengubah ke Native Form Submit...${NC}"
+echo -e "${GREEN}[+] Menyuntikkan sistem Login VVIP...${NC}"
 sleep 1
 
 PTERO_DIR="/var/www/pterodactyl"
@@ -29,7 +29,7 @@ if [ ! -f "$WRAPPER" ]; then
     exit
 fi
 
-# Reset ke file original agar bersih
+# Reset ke file original agar bersih dari error kemarin
 if [ ! -f "$WRAPPER.pure.bak" ]; then
     cp $WRAPPER "$WRAPPER.pure.bak"
 fi
@@ -40,6 +40,7 @@ TMP_WRAPPER="$PTERO_DIR/resources/views/templates/wrapper.tmp"
 cat << 'EOF' > $TMP_WRAPPER
 @if (request()->is('auth/login') || request()->is('auth/password'))
 <style> body > #app { display: none !important; } </style>
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
 <!DOCTYPE html>
 <html lang="en">
@@ -57,10 +58,6 @@ cat << 'EOF' > $TMP_WRAPPER
         body { background-color: var(--bg-dark); color: #fff; font-family: var(--font-ui); min-height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
         #matrix-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; opacity: 0.35; }
         .vignette { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, transparent 20%, var(--bg-dark) 100%); z-index: -1; pointer-events: none; }
-        
-        /* BANNER ERROR DARI LARAVEL BLADE */
-        #rezzx-error-banner { position: fixed; top: 0; left: 0; width: 100%; background: rgba(255, 0, 60, 0.95); color: #fff; z-index: 9999999; padding: 15px 20px; text-align: left; font-family: var(--font-code); font-size: 0.85rem; border-bottom: 2px solid #fff; box-shadow: 0 10px 30px rgba(255,0,60,0.5); backdrop-filter: blur(5px); }
-        .error-title { font-weight: bold; font-size: 1rem; margin-bottom: 5px; text-transform: uppercase; color: #fff; text-shadow: 0 0 5px #fff; }
         
         .top-alert { width: 100%; background: #000; border-bottom: 1px solid var(--neon-purple); padding: 8px 10px; text-align: center; font-family: var(--font-code); font-size: 0.75rem; color: #fff; z-index: 100; box-shadow: 0 4px 15px rgba(188, 19, 254, 0.2); display: flex; justify-content: center; align-items: center; min-height: 35px; }
         #alert-text { color: var(--neon-cyan); text-shadow: 0 0 5px var(--neon-cyan); letter-spacing: 1px; }
@@ -83,7 +80,6 @@ cat << 'EOF' > $TMP_WRAPPER
         .input-box { position: relative; margin-bottom: 20px; }
         .input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666; font-size: 1rem; transition: 0.3s; pointer-events: none; }
         
-        /* TOMBOL MATA PASSWORD */
         .toggle-password { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #888; font-size: 1rem; cursor: pointer; transition: 0.3s; padding: 5px; z-index: 10; }
         .toggle-password:hover { color: var(--neon-cyan); text-shadow: 0 0 5px var(--neon-cyan); }
         
@@ -92,6 +88,7 @@ cat << 'EOF' > $TMP_WRAPPER
         .cyber-input:focus ~ .input-icon { color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
         .btn-cyber { width: 100%; padding: 15px; background: var(--neon-cyan); color: #000; border: none; font-family: var(--font-title); font-weight: 700; font-size: 1.1rem; letter-spacing: 1px; cursor: pointer; position: relative; transition: 0.3s; display: flex; justify-content: center; align-items: center; clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px); }
         .btn-cyber.success { background: var(--neon-green); box-shadow: 0 0 30px rgba(0, 255, 136, 0.5); }
+        .btn-cyber.error { background: var(--neon-red); box-shadow: 0 0 30px rgba(255, 0, 60, 0.5); color: #fff; font-size: 0.8rem; letter-spacing: 0px; text-transform: uppercase;}
         .loader-spinner { display: none; width: 20px; height: 20px; border: 3px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; }
         .action-links { margin-top: 15px; display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; }
         .action-link { color: #888; text-decoration: none; transition: 0.3s; }
@@ -101,20 +98,10 @@ cat << 'EOF' > $TMP_WRAPPER
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(188, 19, 254, 0.5); } 70% { box-shadow: 0 0 0 10px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
     </style>
 </head>
 <body>
-
-    @if (count($errors) > 0)
-    <div id="rezzx-error-banner">
-        <div class="error-title"><i class="fas fa-exclamation-triangle"></i> REZZX SYSTEM AUTH FAILED</div>
-        <strong>LOG:</strong> {{ $errors->first() }}
-    </div>
-    <script>
-        setTimeout(() => { document.getElementById('rezzx-error-banner').style.display = 'none'; }, 9000);
-    </script>
-    @endif
-
     <canvas id="matrix-canvas"></canvas>
     <div class="vignette"></div>
     <audio id="bg-audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
@@ -134,26 +121,19 @@ cat << 'EOF' > $TMP_WRAPPER
                 <p class="card-subtitle">VVIP AUTHENTICATION</p>
             </div>
             
-            <form id="authForm" action="/auth/login" method="POST">
-                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-
+            <form id="authForm">
                 <div id="loginInputs">
                     <div class="input-box">
-                        <input type="text" name="user" class="cyber-input" placeholder="Username or Email" required autofocus>
+                        <input type="text" id="ptero_user" class="cyber-input" placeholder="Username or Email" required autocomplete="username">
                         <i class="fas fa-user input-icon"></i>
                     </div>
                     <div class="input-box">
-                        <input type="password" name="password" id="ptero_password" class="cyber-input" placeholder="Password" required>
+                        <input type="password" id="ptero_password" class="cyber-input" placeholder="Password" required autocomplete="current-password">
                         <i class="fas fa-lock input-icon"></i>
                         <i class="fas fa-eye toggle-password" id="togglePasswordBtn"></i>
                     </div>
                 </div>
-                
-                <button type="submit" class="btn-cyber" id="mainBtn">
-                    <span id="btnText">INITIATE LOGIN</span>
-                    <div class="loader-spinner" id="btnLoader"></div>
-                </button>
-                
+                <button type="submit" class="btn-cyber" id="mainBtn"><span id="btnText">INITIATE LOGIN</span><div class="loader-spinner" id="btnLoader"></div></button>
                 <div class="action-links">
                     <a href="/auth/register" class="action-link">Register</a>
                     <a href="/auth/password" class="action-link">Forgot Password?</a>
@@ -165,7 +145,6 @@ cat << 'EOF' > $TMP_WRAPPER
     <footer class="cyber-footer">&copy; 2026 Pterodactyl Software. Modified by <span>REZZX VVIP</span>.</footer>
 
     <script>
-        // Animasi Murni
         const alertMsg = "WARNING: UNAUTHORIZED SYSTEM ACCESS WILL BE LOGGED AND BLOCKED BY FIREWALL.";
         const alertEl = document.getElementById('alert-text'); let i = 0; let isDeleting = false;
         function typeAlert() { if(!alertEl) return; if (isDeleting) { alertEl.textContent = alertMsg.substring(0, i - 1); i--; if (i === 0) { isDeleting = false; setTimeout(typeAlert, 500); } else { setTimeout(typeAlert, 20); } } else { alertEl.textContent = alertMsg.substring(0, i + 1); i++; if (i === alertMsg.length) { isDeleting = true; setTimeout(typeAlert, 10000); } else { setTimeout(typeAlert, 60); } } }
@@ -179,7 +158,7 @@ cat << 'EOF' > $TMP_WRAPPER
         function drawMatrix() { ctx.fillStyle = 'rgba(5, 5, 8, 0.1)'; ctx.fillRect(0, 0, w, h); ctx.fillStyle = '#bc13fe'; ctx.font = fontSize + 'px monospace'; for(let i = 0; i < drops.length; i++) { const text = letters[Math.floor(Math.random() * letters.length)]; if(Math.random() > 0.8) ctx.fillStyle = '#00f3ff'; else ctx.fillStyle = '#bc13fe'; ctx.fillText(text, i * fontSize, drops[i] * fontSize); if(drops[i] * fontSize > h && Math.random() > 0.975) drops[i] = 0; drops[i]++; } }
         setInterval(drawMatrix, 35); window.addEventListener('resize', () => { w = cvs.width = window.innerWidth; h = cvs.height = window.innerHeight; });
 
-        // LOGIC TOMBOL MATA PASSWORD
+        // TOMBOL MATA PASSWORD
         const togglePasswordBtn = document.getElementById('togglePasswordBtn');
         const passwordInput = document.getElementById('ptero_password');
         togglePasswordBtn.addEventListener('click', function() {
@@ -189,30 +168,59 @@ cat << 'EOF' > $TMP_WRAPPER
             this.classList.toggle('fa-eye-slash');
         });
 
-        // EFEK LOADING KETIKA TOMBOL DIPENCET
-        document.getElementById('authForm').addEventListener('submit', function() {
-            document.getElementById('btnText').style.display = 'none';
-            document.getElementById('btnLoader').style.display = 'block';
-            document.getElementById('mainBtn').style.pointerEvents = 'none';
-        });
+        // ========================================================
+        // API FETCH PTERODACTYL MURNI (ANTI 500)
+        // ========================================================
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            const loader = document.getElementById('btnLoader'); 
+            const btnText = document.getElementById('btnText'); 
+            const mainBtn = document.getElementById('mainBtn');
+            
+            const userVal = document.getElementById('ptero_user').value;
+            const passVal = document.getElementById('ptero_password').value;
+            const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+            const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
 
-        // UBAH TOMBOL MENJADI MERAH JIKA ADA ERROR DARI LARAVEL
-        @if (count($errors) > 0)
-            document.addEventListener("DOMContentLoaded", function() {
-                const btnText = document.getElementById('btnText');
-                const mainBtn = document.getElementById('mainBtn');
-                btnText.textContent = "USERNAME ATAU PASSWORD SALAH";
-                btnText.style.fontSize = "0.75rem";
-                mainBtn.style.background = '#ff003c';
-                mainBtn.style.color = '#fff';
-                setTimeout(() => { 
-                    mainBtn.style.background = 'var(--neon-cyan)';
-                    mainBtn.style.color = '#000';
-                    btnText.textContent = "INITIATE LOGIN"; 
-                    btnText.style.fontSize = "1.1rem";
-                }, 4000);
-            });
-        @endif
+            btnText.style.display = 'none'; loader.style.display = 'block'; mainBtn.style.pointerEvents = 'none'; mainBtn.classList.remove('error');
+
+            try {
+                // WAJIB: Ambil Sanctum Cookie dulu biar nggak ditolak (Error 500)
+                await fetch('/sanctum/csrf-cookie', { method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+
+                // Tembak Login
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ user: userVal, password: passVal })
+                });
+
+                if(response.ok || response.redirected) {
+                    mainBtn.classList.add('success');
+                    loader.style.display = 'none';
+                    btnText.textContent = "SUCCESS";
+                    btnText.style.display = 'block';
+                    setTimeout(() => { window.location.href = '/'; }, 1000);
+                } else {
+                    loader.style.display = 'none';
+                    btnText.textContent = "Username Tidak ditemukan atau password mungkin salah";
+                    btnText.style.display = 'block';
+                    mainBtn.classList.add('error');
+                    setTimeout(() => { mainBtn.classList.remove('error'); btnText.textContent = "INITIATE LOGIN"; mainBtn.style.pointerEvents = 'auto'; }, 4000);
+                }
+            } catch (err) {
+                loader.style.display = 'none';
+                btnText.textContent = "KONEKSI TERPUTUS / SERVER ERROR";
+                btnText.style.display = 'block';
+                mainBtn.classList.add('error');
+                setTimeout(() => { mainBtn.classList.remove('error'); btnText.textContent = "INITIATE LOGIN"; mainBtn.style.pointerEvents = 'auto'; }, 4000);
+            }
+        });
     </script>
 </body>
 </html>
@@ -223,12 +231,12 @@ cat "$WRAPPER.pure.bak" >> $TMP_WRAPPER
 echo "@endif" >> $TMP_WRAPPER
 mv $TMP_WRAPPER $WRAPPER
 
-echo -e "${CYAN}[~] Membersihkan Cache...${NC}"
+echo -e "${CYAN}[~] Membersihkan Cache Ekstrem...${NC}"
 cd $PTERO_DIR
 php artisan view:clear > /dev/null 2>&1
 php artisan config:clear > /dev/null 2>&1
 php artisan cache:clear > /dev/null 2>&1
 
 echo -e "${PURPLE}================================================================${NC}"
-echo -e "${GREEN}    NATIVE ENGINE BERHASIL DI-INSTALL! AYO BUKTIKAN!            ${NC}"
+echo -e "${GREEN}    FINAL FIX SELESAI! AYO BUKTIKAN SEKARANG!                   ${NC}"
 echo -e "${PURPLE}================================================================${NC}"
