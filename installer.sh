@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# REZZX VVIP THEME INSTALLER - FORCE OVERRIDE
+# REZZX VVIP THEME INSTALLER - REAL LOGIN FIX
 # ==========================================
 
 CYAN='\033[0;36m'
@@ -12,9 +12,9 @@ NC='\033[0m'
 
 clear
 echo -e "${PURPLE}================================================================${NC}"
-echo -e "${CYAN}             REZZX VVIP - FORCE LOGIN INJECTION                 ${NC}"
+echo -e "${CYAN}        REZZX VVIP - 100% REAL LOGIN INTEGRATION API            ${NC}"
 echo -e "${PURPLE}================================================================${NC}"
-echo -e "${GREEN}[+] Memulai injeksi paksa ke sistem utama Pterodactyl...${NC}"
+echo -e "${GREEN}[+] Fix error dummy form, mengkoneksikan ke database...${NC}"
 sleep 2
 
 PTERO_DIR="/var/www/pterodactyl"
@@ -25,19 +25,21 @@ if [ ! -f "$WRAPPER" ]; then
     exit
 fi
 
-# Backup file asli
-if [ ! -f "$WRAPPER.rezzx.bak" ]; then
+# Mengembalikan ke file original dulu biar nggak numpuk kodenya
+if [ -f "$WRAPPER.rezzx.bak" ]; then
+    cp "$WRAPPER.rezzx.bak" $WRAPPER
+    echo -e "${GREEN}[+] Membersihkan injeksi lama...${NC}"
+else
     cp $WRAPPER "$WRAPPER.rezzx.bak"
-    echo -e "${GREEN}[+] Backup aman: wrapper.blade.php.rezzx.bak${NC}"
 fi
 
-echo -e "${CYAN}[~] Menyuntikkan kode HTML/CSS ke sistem React...${NC}"
+echo -e "${CYAN}[~] Menyuntikkan kode HTML/CSS dengan REAL API AUTH...${NC}"
 
 # Menghapus tag penutup body dan html bawaan sementara
 sed -i '/<\/body>/d' $WRAPPER
 sed -i '/<\/html>/d' $WRAPPER
 
-# Memasukkan kode HTML VVIP buatanmu sebagai Overlay Layar Penuh
+# Memasukkan kode HTML VVIP REAL LOGIN
 cat << 'EOF' >> $WRAPPER
 
 <div id="rezzx-vip-theme" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 999999; background-color: #050508; overflow: hidden; font-family: 'Rajdhani', sans-serif;">
@@ -46,7 +48,7 @@ cat << 'EOF' >> $WRAPPER
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        #rezzx-vip-theme { --neon-cyan: #00f3ff; --neon-purple: #bc13fe; --neon-green: #00ff88; --bg-dark: #050508; --card-bg: rgba(10, 12, 16, 0.7); --font-title: 'Orbitron', sans-serif; --font-ui: 'Rajdhani', sans-serif; --font-code: 'Fira Code', monospace; color: #fff; display: flex; flex-direction: column; }
+        #rezzx-vip-theme { --neon-cyan: #00f3ff; --neon-purple: #bc13fe; --neon-green: #00ff88; --neon-red: #ff003c; --bg-dark: #050508; --card-bg: rgba(10, 12, 16, 0.7); --font-title: 'Orbitron', sans-serif; --font-ui: 'Rajdhani', sans-serif; --font-code: 'Fira Code', monospace; color: #fff; display: flex; flex-direction: column; }
         #rezzx-vip-theme * { box-sizing: border-box; user-select: none; }
         #matrix-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.35; }
         .vignette { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, transparent 20%, var(--bg-dark) 100%); z-index: 1; pointer-events: none; }
@@ -75,12 +77,11 @@ cat << 'EOF' >> $WRAPPER
         .cyber-input:focus ~ .input-icon { color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
         .btn-cyber { width: 100%; padding: 15px; background: var(--neon-cyan); color: #000; border: none; font-family: var(--font-title); font-weight: 700; font-size: 1.1rem; letter-spacing: 1px; cursor: pointer; position: relative; transition: 0.3s; display: flex; justify-content: center; align-items: center; clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px); }
         .btn-cyber.success { background: var(--neon-green); box-shadow: 0 0 30px rgba(0, 255, 136, 0.5); }
+        .btn-cyber.error { background: var(--neon-red); box-shadow: 0 0 30px rgba(255, 0, 60, 0.5); color: #fff; }
         .loader-spinner { display: none; width: 20px; height: 20px; border: 3px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; }
         .action-links { margin-top: 15px; display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; }
         .action-link { color: #888; text-decoration: none; cursor: pointer; transition: 0.3s; }
         .action-link:hover { color: var(--neon-cyan); }
-        .toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(10, 20, 15, 0.95); border: 1px solid var(--neon-green); color: var(--neon-green); padding: 12px 25px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 12px; z-index: 999999; box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2); transition: top 0.5s; width: 90%; max-width: 350px; }
-        .toast.show { top: 50px; }
         .cyber-footer { width: 100%; padding: 15px; text-align: center; font-family: var(--font-code); font-size: 0.65rem; color: #555; background: #020202; border-top: 1px solid #111; z-index: 10; position: relative; }
         .cyber-footer span { color: var(--neon-purple); }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
@@ -92,7 +93,6 @@ cat << 'EOF' >> $WRAPPER
     <canvas id="matrix-canvas"></canvas>
     <div class="vignette"></div>
     <audio id="bg-audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
-    <div class="toast" id="toast-msg"><i class="fas fa-check-circle" style="font-size: 1.2rem;"></i><span>Kode Reset telah dikirim ke Email!</span></div>
     
     <div class="top-alert"><div><i class="fas fa-shield-alt" style="color: var(--neon-purple); margin-right: 5px;"></i><span id="alert-text"></span><span class="typing-cursor"></span></div></div>
     
@@ -110,15 +110,14 @@ cat << 'EOF' >> $WRAPPER
             </div>
             
             <form id="authForm">
-                <div class="input-box" id="emailBox" style="display: none;"><input type="email" class="cyber-input" id="resetEmail" placeholder="Enter Account Email"><i class="fas fa-envelope input-icon"></i></div>
                 <div id="loginInputs">
-                    <div class="input-box"><input type="text" class="cyber-input" placeholder="Username or Email" required><i class="fas fa-user input-icon"></i></div>
-                    <div class="input-box"><input type="password" class="cyber-input" placeholder="Password" required><i class="fas fa-lock input-icon"></i></div>
+                    <div class="input-box"><input type="text" id="ptero_user" class="cyber-input" placeholder="Username or Email" required autocomplete="username"><i class="fas fa-user input-icon"></i></div>
+                    <div class="input-box"><input type="password" id="ptero_password" class="cyber-input" placeholder="Password" required autocomplete="current-password"><i class="fas fa-lock input-icon"></i></div>
                 </div>
                 <button type="submit" class="btn-cyber" id="mainBtn"><span id="btnText">INITIATE LOGIN</span><div class="loader-spinner" id="btnLoader"></div></button>
                 <div class="action-links">
-                    <span class="action-link" id="registerBtn">Register</span>
-                    <span class="action-link" id="forgotBtn">Forgot Password?</span>
+                    <a href="/auth/register" class="action-link" id="registerBtn">Register</a>
+                    <a href="/auth/password" class="action-link" id="forgotBtn">Forgot Password?</a>
                 </div>
             </form>
         </div>
@@ -128,40 +127,99 @@ cat << 'EOF' >> $WRAPPER
 </div>
 
 <script>
-    // Hanya tampilkan overlay REZZX jika URL adalah halaman login
+    // Hanya tampilkan jika di halaman login
     if (window.location.pathname.includes('/auth/login')) {
         document.getElementById('rezzx-vip-theme').style.display = 'flex';
         
-        // Hapus elemen app bawaan dinosaurus agar layar bersih
+        // Hapus elemen bawaan biar nggak bocor ke bawah
         const appElement = document.getElementById('app');
         if(appElement) { appElement.style.display = 'none'; }
         
-        // LOGIC KODE KAMU MULAI DI SINI
+        // Efek Ketik
         const alertMsg = "WARNING: UNAUTHORIZED SYSTEM ACCESS WILL BE LOGGED AND BLOCKED BY FIREWALL.";
         const alertEl = document.getElementById('alert-text'); let i = 0; let isDeleting = false;
         function typeAlert() { if(!alertEl) return; if (isDeleting) { alertEl.textContent = alertMsg.substring(0, i - 1); i--; if (i === 0) { isDeleting = false; setTimeout(typeAlert, 500); } else { setTimeout(typeAlert, 20); } } else { alertEl.textContent = alertMsg.substring(0, i + 1); i++; if (i === alertMsg.length) { isDeleting = true; setTimeout(typeAlert, 10000); } else { setTimeout(typeAlert, 60); } } }
         setTimeout(typeAlert, 500);
 
+        // Jam
         function runClock() { const clockEl = document.getElementById('clock'); const dateEl = document.getElementById('date'); if(!clockEl) return; const date = new Date(); clockEl.textContent = date.toLocaleTimeString('en-GB'); dateEl.textContent = date.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase().replace(/ /g, '-'); }
         setInterval(runClock, 1000); runClock();
 
+        // Music
         const audio = document.getElementById('bg-audio'); const btnMusic = document.getElementById('musicBtn'); const iconMusic = document.getElementById('musicIcon');
         if(btnMusic) { btnMusic.addEventListener('click', () => { if(audio.paused) { audio.play(); iconMusic.className = 'fas fa-pause'; btnMusic.classList.add('playing'); } else { audio.pause(); iconMusic.className = 'fas fa-play'; btnMusic.classList.remove('playing'); } }); }
 
+        // Matrix
         const cvs = document.getElementById('matrix-canvas'); const ctx = cvs.getContext('2d'); let w = cvs.width = window.innerWidth; let h = cvs.height = window.innerHeight;
         const letters = '0123456789REZZXVVIP'.split(''); const fontSize = 12; const cols = w / fontSize; const drops = []; for(let x = 0; x < cols; x++) drops[x] = 1;
         function drawMatrix() { ctx.fillStyle = 'rgba(5, 5, 8, 0.1)'; ctx.fillRect(0, 0, w, h); ctx.fillStyle = '#bc13fe'; ctx.font = fontSize + 'px monospace'; for(let i = 0; i < drops.length; i++) { const text = letters[Math.floor(Math.random() * letters.length)]; if(Math.random() > 0.8) ctx.fillStyle = '#00f3ff'; else ctx.fillStyle = '#bc13fe'; ctx.fillText(text, i * fontSize, drops[i] * fontSize); if(drops[i] * fontSize > h && Math.random() > 0.975) drops[i] = 0; drops[i]++; } }
         setInterval(drawMatrix, 35); window.addEventListener('resize', () => { w = cvs.width = window.innerWidth; h = cvs.height = window.innerHeight; });
 
-        let isForgotMode = false; const loginInputs = document.getElementById('loginInputs'); const emailBox = document.getElementById('emailBox'); const btnText = document.getElementById('btnText'); const forgotBtn = document.getElementById('forgotBtn'); const mainBtn = document.getElementById('mainBtn'); const toast = document.getElementById('toast-msg');
-        if(forgotBtn) { forgotBtn.addEventListener('click', () => { isForgotMode = !isForgotMode; if (isForgotMode) { loginInputs.style.display = 'none'; emailBox.style.display = 'block'; document.getElementById('resetEmail').setAttribute('required', 'true'); btnText.textContent = "SEND RESET LINK"; forgotBtn.textContent = "Back to Login"; } else { emailBox.style.display = 'none'; loginInputs.style.display = 'block'; document.getElementById('resetEmail').removeAttribute('required'); btnText.textContent = "INITIATE LOGIN"; forgotBtn.textContent = "Forgot Password?"; } }); }
-
+        // ========================================================
+        // 100% REAL LOGIN INTEGRATION (BYPASS REACT TO LARAVEL)
+        // ========================================================
         const authForm = document.getElementById('authForm');
         if(authForm) {
             authForm.addEventListener('submit', (e) => {
-                e.preventDefault(); const loader = document.getElementById('btnLoader'); btnText.style.display = 'none'; loader.style.display = 'block'; mainBtn.style.pointerEvents = 'none';
-                if (isForgotMode) { setTimeout(() => { loader.style.display = 'none'; btnText.style.display = 'block'; mainBtn.style.pointerEvents = 'auto'; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); forgotBtn.click(); }, 3000); authForm.reset(); }, 1500); } 
-                else { setTimeout(() => { loader.style.display = 'none'; btnText.textContent = "ERROR: DUMMY FORM"; btnText.style.display = 'block'; mainBtn.classList.add('success'); setTimeout(() => { mainBtn.classList.remove('success'); btnText.textContent = "INITIATE LOGIN"; mainBtn.style.pointerEvents = 'auto'; authForm.reset(); alert('Peringatan: Ini adalah form dummy visual. Integrasi React JS belum dilakukan.'); }, 2000); }, 2000); }
+                e.preventDefault(); 
+                const loader = document.getElementById('btnLoader'); 
+                const btnText = document.getElementById('btnText'); 
+                const mainBtn = document.getElementById('mainBtn');
+                
+                const userVal = document.getElementById('ptero_user').value;
+                const passVal = document.getElementById('ptero_password').value;
+                
+                // Ambil CSRF Token Pterodactyl Bawaan
+                const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
+                btnText.style.display = 'none'; 
+                loader.style.display = 'block'; 
+                mainBtn.style.pointerEvents = 'none';
+                mainBtn.classList.remove('error');
+
+                // Tembak API Asli Pterodactyl
+                fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ user: userVal, password: passVal })
+                })
+                .then(async response => {
+                    if(response.ok || response.redirected) {
+                        // BERHASIL LOGIN!
+                        mainBtn.classList.add('success');
+                        loader.style.display = 'none';
+                        btnText.textContent = "ACCESS GRANTED";
+                        btnText.style.display = 'block';
+                        
+                        // Lempar ke dalam panel
+                        setTimeout(() => { window.location.href = '/'; }, 1000);
+                    } else {
+                        // PASSWORD / USERNAME SALAH
+                        loader.style.display = 'none';
+                        btnText.textContent = "INVALID CREDENTIALS";
+                        btnText.style.display = 'block';
+                        mainBtn.classList.add('error');
+                        
+                        setTimeout(() => { 
+                            mainBtn.classList.remove('error'); 
+                            btnText.textContent = "INITIATE LOGIN"; 
+                            mainBtn.style.pointerEvents = 'auto'; 
+                        }, 2500);
+                    }
+                })
+                .catch(err => {
+                    // ERROR SISTEM
+                    loader.style.display = 'none';
+                    btnText.textContent = "SYSTEM ERROR";
+                    btnText.style.display = 'block';
+                    mainBtn.classList.add('error');
+                    setTimeout(() => { mainBtn.classList.remove('error'); btnText.textContent = "INITIATE LOGIN"; mainBtn.style.pointerEvents = 'auto'; }, 2500);
+                });
             });
         }
     }
@@ -170,14 +228,14 @@ cat << 'EOF' >> $WRAPPER
 </html>
 EOF
 
-echo -e "${CYAN}[~] Membersihkan Cache View Sistem...${NC}"
+echo -e "${CYAN}[~] Membersihkan Cache Laravel & View...${NC}"
 cd $PTERO_DIR
 php artisan view:clear > /dev/null 2>&1
 php artisan config:clear > /dev/null 2>&1
 
 echo -e "${PURPLE}================================================================${NC}"
-echo -e "${GREEN}             OVERRIDE SELESAI! SILAKAN REFRESH!                 ${NC}"
+echo -e "${GREEN}       REAL LOGIN OVERRIDE BERHASIL DI-INSTALL!                 ${NC}"
 echo -e "${PURPLE}================================================================${NC}"
-echo -e "${YELLOW}Coba buka IP Pterodactyl kamu, gambar dinosaurusnya pasti${NC}"
-echo -e "${YELLOW}sudah hilang terganti tema REZZX kamu!${NC}"
+echo -e "${YELLOW}Silakan REFRESH browser kamu sekarang (Tekan Ctrl + F5).${NC}"
+echo -e "${YELLOW}Coba login pakai username dan password panelmu. Pasti bisa masuk!${NC}"
 echo -e "${PURPLE}================================================================${NC}"
