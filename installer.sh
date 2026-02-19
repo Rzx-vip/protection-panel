@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# REZZX VVIP THEME INSTALLER - REAL LOGIN FIX V2
+# REZZX VVIP THEME INSTALLER - REAL LOGIN FINAL FIX
 # ==========================================
 
 CYAN='\033[0;36m'
@@ -12,9 +12,9 @@ NC='\033[0m'
 
 clear
 echo -e "${PURPLE}================================================================${NC}"
-echo -e "${CYAN}        REZZX VVIP - 100% REAL LOGIN INTEGRATION API V2         ${NC}"
+echo -e "${CYAN}        REZZX VVIP - 100% REAL LOGIN FINAL FIX                  ${NC}"
 echo -e "${PURPLE}================================================================${NC}"
-echo -e "${GREEN}[+] Fix API Session Cookies & Logo Centering...${NC}"
+echo -e "${GREEN}[+] Memperbaiki koneksi API ke Laravel Pterodactyl...${NC}"
 sleep 2
 
 PTERO_DIR="/var/www/pterodactyl"
@@ -25,19 +25,23 @@ if [ ! -f "$WRAPPER" ]; then
     exit
 fi
 
-# Mengembalikan ke file original dulu biar bersih
-if [ -f "$WRAPPER.rezzx.bak" ]; then
-    cp "$WRAPPER.rezzx.bak" $WRAPPER
-    echo -e "${GREEN}[+] Membersihkan injeksi lama...${NC}"
-else
-    cp $WRAPPER "$WRAPPER.rezzx.bak"
+# ==========================================
+# FIX SISTEM BACKUP AGAR TIDAK RUSAK
+# ==========================================
+if [ ! -f "$WRAPPER.original.bak" ]; then
+    cp $WRAPPER "$WRAPPER.original.bak"
+    echo -e "${GREEN}[+] Backup original pertama diamankan.${NC}"
 fi
 
-echo -e "${CYAN}[~] Menyuntikkan kode HTML/CSS VVIP ke sistem...${NC}"
+# Selalu kembalikan ke file asli sebelum menyuntikkan kode baru
+cp "$WRAPPER.original.bak" $WRAPPER
+echo -e "${CYAN}[~] Menyuntikkan kode VVIP dengan Bypass API...${NC}"
 
+# Menghapus tag penutup body dan html bawaan sementara
 sed -i '/<\/body>/d' $WRAPPER
 sed -i '/<\/html>/d' $WRAPPER
 
+# Memasukkan kode HTML VVIP
 cat << 'EOF' >> $WRAPPER
 
 <div id="rezzx-vip-theme" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 999999; background-color: #050508; overflow: hidden; font-family: 'Rajdhani', sans-serif;">
@@ -66,10 +70,10 @@ cat << 'EOF' >> $WRAPPER
         .glass-card::before { content: ''; position: absolute; top: 0; left: 10%; width: 80%; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); box-shadow: 0 0 15px var(--neon-cyan); }
         .logo-wrapper { text-align: center; margin-bottom: 25px; }
         
-        /* FIX LOGO MENCENG: Display block dan margin auto */
+        /* LOGO PAS DI TENGAH */
         .ptero-logo { width: 70px; height: 70px; filter: drop-shadow(0 0 10px var(--neon-cyan)); display: block; margin: 0 auto 10px auto; animation: float 4s ease-in-out infinite; }
         
-        .card-title { font-family: var(--font-title); font-size: 1.4rem; letter-spacing: 2px; text-align: center; }
+        .card-title { font-family: var(--font-title); font-size: 1.4rem; letter-spacing: 2px; text-align: center; margin-bottom: 5px; }
         .card-subtitle { font-family: var(--font-code); font-size: 0.75rem; color: var(--neon-purple); letter-spacing: 1px; text-align: center; }
         .input-box { position: relative; margin-bottom: 20px; }
         .input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666; font-size: 1rem; transition: 0.3s; }
@@ -93,7 +97,7 @@ cat << 'EOF' >> $WRAPPER
 
     <canvas id="matrix-canvas"></canvas>
     <div class="vignette"></div>
-    <audio id="bg-audio" src="https://image2url.com/r2/default/audio/1771466790440-f93287e0-159b-46ca-8dba-99069e245417.mp3"></audio>
+    <audio id="bg-audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
     
     <div class="top-alert"><div><i class="fas fa-shield-alt" style="color: var(--neon-purple); margin-right: 5px;"></i><span id="alert-text"></span><span class="typing-cursor"></span></div></div>
     
@@ -151,7 +155,7 @@ cat << 'EOF' >> $WRAPPER
         setInterval(drawMatrix, 35); window.addEventListener('resize', () => { w = cvs.width = window.innerWidth; h = cvs.height = window.innerHeight; });
 
         // ========================================================
-        // FIX: TAMBAHKAN KREDENSIAL SESI (credentials: 'same-origin')
+        // KUNCI UTAMA: HEADER API LARAVEL LENGKAP
         // ========================================================
         const authForm = document.getElementById('authForm');
         if(authForm) {
@@ -164,6 +168,7 @@ cat << 'EOF' >> $WRAPPER
                 const userVal = document.getElementById('ptero_user').value;
                 const passVal = document.getElementById('ptero_password').value;
                 
+                // Ambil token keamanan langsung dari sistem Pterodactyl
                 const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
                 const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
 
@@ -172,33 +177,31 @@ cat << 'EOF' >> $WRAPPER
                 mainBtn.style.pointerEvents = 'none';
                 mainBtn.classList.remove('error');
 
+                // Eksekusi API
                 fetch('/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json'
+                        'X-Requested-With': 'XMLHttpRequest' // WAJIB ADA AGAR TIDAK DIANGGAP BOT
                     },
-                    credentials: 'same-origin', // <-- INI DIA KUNCI FIX-NYA BIAR GA INVALID TERUS!
                     body: JSON.stringify({ user: userVal, password: passVal })
                 })
                 .then(async response => {
-                    if(response.ok || response.redirected) {
+                    // Kalau berhasil masuk atau disuruh pindah halaman
+                    if(response.ok || response.status === 200 || response.status === 204) {
                         mainBtn.classList.add('success');
                         loader.style.display = 'none';
                         btnText.textContent = "ACCESS GRANTED";
                         btnText.style.display = 'block';
+                        
+                        // Otomatis refresh untuk masuk ke dalam panel
                         setTimeout(() => { window.location.href = '/'; }, 1000);
                     } else {
+                        // Kalau salah password atau username
                         loader.style.display = 'none';
-                        
-                        // Menangkap error spesifik jika server memblokir sesi
-                        if (response.status === 419) {
-                            btnText.textContent = "SESSION EXPIRED (419)";
-                        } else {
-                            btnText.textContent = "INVALID CREDENTIALS";
-                        }
-                        
+                        btnText.textContent = "INVALID CREDENTIALS";
                         btnText.style.display = 'block';
                         mainBtn.classList.add('error');
                         
@@ -210,6 +213,7 @@ cat << 'EOF' >> $WRAPPER
                     }
                 })
                 .catch(err => {
+                    console.error("Login Error:", err);
                     loader.style.display = 'none';
                     btnText.textContent = "SYSTEM ERROR";
                     btnText.style.display = 'block';
@@ -230,8 +234,8 @@ php artisan view:clear > /dev/null 2>&1
 php artisan config:clear > /dev/null 2>&1
 
 echo -e "${PURPLE}================================================================${NC}"
-echo -e "${GREEN}       REAL LOGIN V2 BERHASIL DI-INSTALL!                       ${NC}"
+echo -e "${GREEN}       REAL LOGIN FINAL BERHASIL DI-INSTALL!                    ${NC}"
 echo -e "${PURPLE}================================================================${NC}"
 echo -e "${YELLOW}Silakan REFRESH browser kamu (Ctrl + F5). Logonya udah di tengah${NC}"
-echo -e "${YELLOW}dan loginnya sekarang membaca sesi cookies dengan akurat!${NC}"
+echo -e "${YELLOW}dan Bypass API sudah ditambahkan!${NC}"
 echo -e "${PURPLE}================================================================${NC}"
